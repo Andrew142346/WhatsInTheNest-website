@@ -1,0 +1,114 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* only show vertical scrollbar when needed */
+    overflow-y: auto;
+    /* prevent horizontal scrollbar from rotated/overflowing elements */
+    overflow-x: hidden;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: top;
+    size: 100%;
+    background: linear-gradient(45deg, blue, royalblue 30%, dodgerblue);
+}
+h1, h2, h3, p {
+    text-align: center;
+    font-family: "Arial", sans-serif;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.header{
+    display: flex;
+    flex-direction: column;
+    justify-content: top;
+    align-items: center;
+    width: 100%;
+    height: 20vh;
+    background-color: gold;
+}
+.title-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    width: 100%;
+    height: 70%;
+    gap: 2vw;
+}
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    margin: .5vh;
+    height: 13vh;
+    width: 13vh;
+    overflow: hidden;
+    border-radius: 50%;
+}
+.logo{
+    height: 10vh;
+    width: auto;
+    margin: 1vh;
+}
+.title-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 80%;
+    padding: 1vh;
+}
+.title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    font-size: 10vh;
+}
+.subtitle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2vh;
+    width: 100%;
+    height: 30%;
+    background-color: goldenrod ;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 80vh;
+    padding: 2vh;
+    gap: 2vh;
+}
+
+
+/* Hide scrollbar for Chrome, Safari and Opera on html/body when requested */
+html.hide-scrollbar::-webkit-scrollbar,
+body.hide-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox on html/body when requested */
+html.hide-scrollbar,
+body.hide-scrollbar,
+.hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
