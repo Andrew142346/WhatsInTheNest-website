@@ -32,16 +32,12 @@
       <a href="items.html">View Items</a>
       <a href="report.html">Report Item</a>
       <a href="admin.html">Admin</a>
-      <a href="settings.html" class="admin-only" style="display: none"
-        >Settings</a
-      >
-      <a href="stats.html" class="admin-only" style="display: none"
-        >Statistics</a
-      >
+      <a href="settings.html" class="admin-only">Settings</a>
+      <a href="stats.html" class="admin-only">Statistics</a>
     </nav>
 
     <!-- Login Modal -->
-    <div id="settingsLoginModal" class="login-modal" style="display: none">
+    <div id="settingsLoginModal" class="login-modal hidden">
       <div class="login-modal-content">
         <h2>Admin Login Required</h2>
         <form id="settingsLoginForm">
@@ -57,7 +53,7 @@
     </div>
 
     <main>
-      <section id="settingsContent" style="display: none">
+      <section id="settingsContent" class="hidden">
         <h2>Security</h2>
         <label for="newAdminPass">New admin password</label>
         <input id="newAdminPass" type="password" placeholder="New password" />

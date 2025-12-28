@@ -591,6 +591,27 @@ svg rect.chart-rect:hover {
   display: none;
 }
 
+.hidden {
+  display: none;
+}
+
+.section-search-input {
+  width: 100%;
+  max-width: 500px;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.section-search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
 hr {
   border: none;
   border-top: 2px solid var(--border-color);

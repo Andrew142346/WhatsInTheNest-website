@@ -1,30 +1,5 @@
 /* Application logic */
 const DEFAULT_ADMIN_PASSWORD = 'teacher123';
-// Provide safe fallbacks when running in non-browser environments (jsdom/node tests)
-if (typeof globalThis !== 'undefined' && typeof globalThis.localStorage === 'undefined') {
-  (function () {
-    let _store = {};
-    globalThis.localStorage = {
-      getItem: (k) => (_store.hasOwnProperty(k) ? _store[k] : null),
-      setItem: (k, v) => { _store[k] = String(v); },
-      removeItem: (k) => { delete _store[k]; },
-      clear: () => { _store = {}; }
-    };
-  })();
-}
-if (typeof globalThis !== 'undefined' && typeof globalThis.FileReader === 'undefined') {
-  // minimal FileReader shim for environments that don't provide one
-  globalThis.FileReader = function () {
-    this.onload = null;
-    this.result = null;
-    this.readAsDataURL = function (file) {
-      if (typeof this.onload === 'function') this.onload({ target: { result: null } });
-    };
-  };
-}
-// Ensure bare identifiers exist in vm scope (prevents ReferenceError under jsdom)
-var localStorage = (typeof globalThis !== 'undefined' ? globalThis.localStorage : undefined);
-var FileReader = (typeof globalThis !== 'undefined' ? globalThis.FileReader : undefined);
 
 let items = JSON.parse(localStorage.getItem('lostItems')) || [];
 
@@ -125,14 +100,6 @@ function getAdminPassword() {
 
 function setAdminPassword(p) {
   localStorage.setItem('adminPassword', p);
-}
-
-// Expose to window scope for tests
-if (typeof window !== 'undefined') {
-  window.getAdminPassword = getAdminPassword;
-  window.setAdminPassword = setAdminPassword;
-  window.save = save;
-  window.items = items;
 }
 
 /* --- Non-blocking UI helpers --- */
@@ -379,8 +346,8 @@ if (adminLoginModal && adminLoginForm && adminContent) {
       adminListEl.innerHTML = '';
       items.forEach((i) => {
         const idx = items.indexOf(i);
-        // skip already-approved & active items, skip claimed items, skip items with pending claim requests
-        if ((i.approved && !i.resolved && !i.claimRequested) || i.resolved || i.claimRequested) return;
+        // skip approved items, resolved items, and items with pending claim requests
+        if (i.approved || i.resolved || i.claimRequested) return;
         
         // Apply search filter
         if (searchTerm && !i.name.toLowerCase().includes(searchTerm) && 
@@ -439,18 +406,104 @@ if (adminLoginModal && adminLoginForm && adminContent) {
       });
       
       // Attach view inquiries handlers
+      function showInquiriesModal(item) {
+        if (!item || !item.inquiries || item.inquiries.length === 0) return;
+
+        // Remove any existing inquiries modal to avoid duplicates
+        const existing = document.getElementById('inquiriesModal');
+        if (existing && existing.parentNode) {
+          existing.parentNode.removeChild(existing);
+        }
+
+        const overlay = document.createElement('div');
+        overlay.id = 'inquiriesModal';
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '10000';
+
+        const dialog = document.createElement('div');
+        dialog.style.backgroundColor = '#fff';
+        dialog.style.borderRadius = '4px';
+        dialog.style.maxWidth = '600px';
+        dialog.style.width = '90%';
+        dialog.style.maxHeight = '80vh';
+        dialog.style.overflowY = 'auto';
+        dialog.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+        dialog.style.padding = '16px 20px';
+
+        const title = document.createElement('h2');
+        title.textContent = `Inquiries for "${item.name}"`;
+        title.style.marginTop = '0';
+
+        const list = document.createElement('ol');
+        list.style.paddingLeft = '20px';
+
+        item.inquiries.forEach((inq, index) => {
+          const li = document.createElement('li');
+          const date = inq.inquiredAt ? new Date(inq.inquiredAt).toLocaleString() : '';
+          const info = document.createElement('div');
+          info.textContent = inq.inquirerInfo || '';
+          const meta = document.createElement('div');
+          meta.style.fontSize = '0.85em';
+          meta.style.color = '#666';
+          meta.textContent = date ? `(${date})` : '';
+          li.appendChild(info);
+          li.appendChild(meta);
+          list.appendChild(li);
+        });
+
+        const footer = document.createElement('div');
+        footer.style.textAlign = 'right';
+        footer.style.marginTop = '16px';
+
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.textContent = 'Close';
+        closeBtn.addEventListener('click', () => {
+          if (overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+          }
+          document.removeEventListener('keydown', onKeyDown);
+        });
+
+        footer.appendChild(closeBtn);
+        dialog.appendChild(title);
+        dialog.appendChild(list);
+        dialog.appendChild(footer);
+        overlay.appendChild(dialog);
+
+        function onKeyDown(e) {
+          if (e.key === 'Escape') {
+            if (overlay.parentNode) {
+              overlay.parentNode.removeChild(overlay);
+            }
+            document.removeEventListener('keydown', onKeyDown);
+          }
+        }
+
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) {
+            if (overlay.parentNode) {
+              overlay.parentNode.removeChild(overlay);
+            }
+            document.removeEventListener('keydown', onKeyDown);
+          }
+        });
+
+        document.body.appendChild(overlay);
+        document.addEventListener('keydown', onKeyDown);
+      }
+
       inquiriesListEl.querySelectorAll('.viewInquiriesBtn').forEach(btn => {
         btn.addEventListener('click', () => {
           const idx = Number(btn.dataset.idx);
           if (!items[idx] || !items[idx].inquiries) return;
-          
-          let message = `Inquiries for "${items[idx].name}":\n\n`;
-          items[idx].inquiries.forEach((inq, i) => {
-            const date = new Date(inq.inquiredAt).toLocaleString();
-            message += `${i + 1}. ${inq.inquirerInfo}\n   (${date})\n\n`;
-          });
-          
-          alert(message);
+
+          showInquiriesModal(items[idx]);
         });
       });
       
@@ -561,7 +614,6 @@ if (adminLoginModal && adminLoginForm && adminContent) {
           const id = btn.dataset.id;
           const idx = Number(btn.dataset.idx);
           if(apiEnabled() && id){ 
-            // TODO: need backend endpoint for approving claims
             showToast('API claim approval not yet implemented', 'error');
           } else { 
             items[idx].resolved = true;
@@ -584,7 +636,6 @@ if (adminLoginModal && adminLoginForm && adminContent) {
           const ok = await showConfirm('Reject this claim request?');
           if (!ok) return;
           if(apiEnabled() && id){ 
-            // TODO: need backend endpoint for rejecting claims
             showToast('API claim rejection not yet implemented', 'error');
           } else { 
             items[idx].claimRequested = false;

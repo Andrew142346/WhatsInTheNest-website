@@ -36,7 +36,7 @@
     </nav>
 
     <!-- Login Modal -->
-    <div id="adminLoginModal" class="login-modal" style="display: none">
+    <div id="adminLoginModal" class="login-modal hidden">
       <div class="login-modal-content">
         <h2>Admin Login Required</h2>
         <form id="adminLoginForm">
@@ -52,24 +52,17 @@
     </div>
 
     <main>
-      <div id="adminContent" style="display: none">
+      <div id="adminContent" class="hidden">
         <div class="admin-section">
           <button class="section-toggle" id="togglePendingItems" type="button">
             Pending Items (New Submissions) ▼
           </button>
-          <div id="pendingItemsSection" style="display: none">
+          <div id="pendingItemsSection" class="hidden">
             <input
               id="pendingItemsSearch"
+              class="section-search-input"
               placeholder="Search pending items..."
               aria-label="Search pending items"
-              style="
-                width: 100%;
-                max-width: 500px;
-                padding: 8px;
-                margin: 10px 0;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-              "
             />
             <ul id="adminList"></ul>
           </div>
@@ -79,19 +72,12 @@
           <button class="section-toggle" id="toggleInquiries" type="button">
             Inquiries ▼
           </button>
-          <div id="inquiriesSection" style="display: none">
+          <div id="inquiriesSection" class="hidden">
             <input
               id="inquiriesSearch"
+              class="section-search-input"
               placeholder="Search inquiries..."
               aria-label="Search inquiries"
-              style="
-                width: 100%;
-                max-width: 500px;
-                padding: 8px;
-                margin: 10px 0;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-              "
             />
             <ul id="inquiriesList"></ul>
           </div>
@@ -101,19 +87,12 @@
           <button class="section-toggle" id="toggleClaimRequests" type="button">
             Pending Claim Requests ▼
           </button>
-          <div id="claimRequestsSection" style="display: none">
+          <div id="claimRequestsSection" class="hidden">
             <input
               id="claimRequestsSearch"
+              class="section-search-input"
               placeholder="Search claim requests..."
               aria-label="Search claim requests"
-              style="
-                width: 100%;
-                max-width: 500px;
-                padding: 8px;
-                margin: 10px 0;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-              "
             />
             <ul id="claimRequestsList"></ul>
           </div>
@@ -123,19 +102,12 @@
           <button class="section-toggle" id="toggleClaimedItems" type="button">
             Claimed Items ▼
           </button>
-          <div id="claimedItemsSection" style="display: none">
+          <div id="claimedItemsSection" class="hidden">
             <input
               id="claimedItemsSearch"
+              class="section-search-input"
               placeholder="Search claimed items..."
               aria-label="Search claimed items"
-              style="
-                width: 100%;
-                max-width: 500px;
-                padding: 8px;
-                margin: 10px 0;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-              "
             />
             <ul id="claimedList"></ul>
           </div>
