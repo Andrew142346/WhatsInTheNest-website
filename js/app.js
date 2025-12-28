@@ -128,7 +128,11 @@ const API_BASE = (function(){
   }catch(e){ return null; }
 })();
 
-function apiEnabled(){ return !!API_BASE; }
+function apiEnabled(){ 
+  const enabled = !!API_BASE;
+  console.log('[API Debug] API Enabled:', enabled, 'API Base:', API_BASE);
+  return enabled;
+}
 
 async function apiFetch(method, path, body){
   if(!API_BASE) throw new Error('API not configured');
