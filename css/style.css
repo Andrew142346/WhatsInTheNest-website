@@ -530,11 +530,6 @@ svg {
 svg text {
   font-family: var(--font-family);
   fill: var(--text-color);
-  alignment-baseline: middle;
-}
-
-svg rect {
-  rx: 4;
 }
 
 svg rect.chart-rect {
