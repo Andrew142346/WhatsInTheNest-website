@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!-- Admin moderation panel -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header><h1>Admin Panel</h1></header>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      ☰
+    </button>
+    <aside class="sidebar" id="quickSidebar" aria-hidden="true">
+      <nav class="sidebar-nav">
+        <a href="index.html">Home</a>
+        <a href="items.html">View Items</a>
+        <a href="report.html">Report Item</a>
+        <a href="admin.html">Admin</a>
+        <hr />
+        <div class="sidebar-demo">
+          <button id="demoToastBtn" type="button">Show demo toast</button>
+          <button id="demoConfirmBtn" type="button">Show demo confirm</button>
+        </div>
+      </nav>
+    </aside>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="items.html">View Items</a>
+    </nav>
+
+    <main>
+      <form id="adminForm">
+        <input
+          type="password"
+          id="adminPass"
+          placeholder="Admin password"
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
+      <!-- Hidden until successful login -->
+      <!-- NOTE: password change moved to Settings page -->
+      <ul id="adminList"></ul>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+      (function () {
+        var s = document.createElement("script");
+        s.src = "config.js";
+        s.onerror = function () {
+          if (location.hostname === "whatsinthenest.com")
+            window.APP_CONFIG = window.APP_CONFIG || {
+              apiBase: location.origin,
+            };
+        };
+        document.head.appendChild(s);
+      })();
+    </script>
+  </body>
+</html>

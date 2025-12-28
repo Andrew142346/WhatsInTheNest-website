@@ -1,0 +1,28 @@
+/* Minimal base styles so you can customize freely */
+html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif}
+body{background:#fff;color:#000}
+
+header{padding:12px}
+
+/* Quick link sidebar */
+.hamburger{position:fixed;left:12px;top:12px;z-index:1200;border:none;background:transparent;font-size:24px;cursor:pointer}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:240px;transform:translateX(-100%);background:#fafafa;border-right:1px solid #ddd;padding:16px;box-shadow:2px 0 6px rgba(0,0,0,0.05);transition:transform .2s ease;z-index:1100}
+.sidebar.open{transform:translateX(0)}
+.sidebar a{display:block;padding:8px 6px;color:#111;text-decoration:none}
+
+/* Keep helpers for toasts/modals (small set) */
+.toast-container{position:fixed;right:16px;bottom:16px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+.toast{min-width:180px;padding:10px 12px;border-radius:6px;opacity:0;transform:translateY(8px);transition:all .2s ease}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast--success{background:#2e7d32;color:#fff}
+.toast--error{background:#c62828;color:#fff}
+.toast--info{background:#1565c0;color:#fff}
+.confirm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;z-index:1100}
+.confirm-box{background:#fff;padding:16px;border-radius:8px}
+
+/* Stats SVG micro-charts */
+svg { width: 100%; height: auto; max-width: 700px; }
+svg text { font-family: inherit; fill: #111; alignment-baseline: middle; }
+svg rect { rx: 3; }
+svg rect.chart-rect { transition: fill .15s ease, width .25s ease; }
+svg rect.chart-rect:hover { filter: brightness(.95); }

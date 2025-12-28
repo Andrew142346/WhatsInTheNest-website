@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Statistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header><h1>Statistics</h1></header>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      ☰
+    </button>
+    <aside class="sidebar" id="quickSidebar" aria-hidden="true">
+      <nav class="sidebar-nav">
+        <a href="index.html">Home</a>
+        <a href="items.html">View Items</a>
+        <a href="report.html">Report Item</a>
+        <a href="admin.html">Admin</a>
+        <a href="settings.html">Settings</a>
+        <a href="stats.html">Statistics</a>
+      </nav>
+    </aside>
+
+    <main>
+      <section id="statsSummary">
+        <h2>Overview</h2>
+        <div id="statsTotals"></div>
+      </section>
+
+      <section id="statsByCategory">
+        <h2>By Category</h2>
+        <div id="categoryChart"></div>
+      </section>
+
+      <section id="statsByLocation">
+        <h2>By Location</h2>
+        <div id="locationChart"></div>
+      </section>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+      (function () {
+        var s = document.createElement("script");
+        s.src = "config.js";
+        s.onerror = function () {
+          if (location.hostname === "whatsinthenest.com")
+            window.APP_CONFIG = window.APP_CONFIG || {
+              apiBase: location.origin,
+            };
+        };
+        document.head.appendChild(s);
+      })();
+    </script>
+  </body>
+</html>

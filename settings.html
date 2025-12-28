@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Settings</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Admin Settings</h1>
+    </header>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      ☰
+    </button>
+    <aside class="sidebar" id="quickSidebar" aria-hidden="true">
+      <nav class="sidebar-nav">
+        <a href="index.html">Home</a>
+        <a href="items.html">View Items</a>
+        <a href="report.html">Report Item</a>
+        <a href="admin.html">Admin</a>
+        <a href="settings.html">Settings</a>
+        <a href="stats.html">Statistics</a>
+        <hr />
+        <div class="sidebar-demo">
+          <button id="demoToastBtn" type="button">Show demo toast</button>
+          <button id="demoConfirmBtn" type="button">Show demo confirm</button>
+        </div>
+      </nav>
+    </aside>
+
+    <main>
+      <section id="settingsLogin">
+        <h2>Admin login</h2>
+        <form id="settingsAdminForm">
+          <input
+            type="password"
+            id="settingsAdminPass"
+            placeholder="Admin password"
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+      </section>
+
+      <section id="settingsContent" style="display: none">
+        <h2>Security</h2>
+        <label for="newAdminPass">New admin password</label>
+        <input id="newAdminPass" type="password" placeholder="New password" />
+        <button id="changePassBtn" type="button">Change password</button>
+
+        <hr />
+        <h2>Data</h2>
+        <button id="resetDataBtn" type="button">
+          Reset all items (delete)
+        </button>
+      </section>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+      (function () {
+        var s = document.createElement("script");
+        s.src = "config.js";
+        s.onerror = function () {
+          if (location.hostname === "whatsinthenest.com")
+            window.APP_CONFIG = window.APP_CONFIG || {
+              apiBase: location.origin,
+            };
+        };
+        document.head.appendChild(s);
+      })();
+    </script>
+  </body>
+</html>

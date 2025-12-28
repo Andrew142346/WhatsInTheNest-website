@@ -1,41 +1,57 @@
 <!DOCTYPE html>
+<!-- Home page -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="keywords"
-      content="keywords.txt"
-    />
-    <meta
-      name="description"
-      content="Find or report items lost in the Jefferson C - 123 School District."
-    />
-    <title>What's in the Nest</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>What's in the Nest?</title>
+    <link rel="stylesheet" href="css/style.css" />
   </head>
-  <body class="hide-scrollbar">
-    <div class="header">
-      <div class="title-bar">
-        <div class="logo-container">
-          <a href="https://www.jeffersonc123.org/" target="_blank">
-            <img class="logo" src="Eagle.jpg" alt="Logo" />
-          </a>
+  <body>
+    <header>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+        ☰
+      </button>
+      <h1>What's in the Nest?</h1>
+      <p>School Lost & Found System</p>
+    </header>
+
+    <aside class="sidebar" id="quickSidebar" aria-hidden="true">
+      <nav class="sidebar-nav">
+        <a href="index.html">Home</a>
+        <a href="items.html">View Items</a>
+        <a href="report.html">Report Item</a>
+        <a href="admin.html">Admin</a>
+        <hr />
+        <div class="sidebar-demo">
+          <button id="demoToastBtn" type="button">Show demo toast</button>
+          <button id="demoConfirmBtn" type="button">Show demo confirm</button>
         </div>
-        <div class="title-container">
-          <h1 class="title">What's in the Nest</h1>
-        </div>
-      </div>
-      <div class="subtitle">
-        <h2>Jefferson C -123 Lost and Found</h2>
-      </div>
-    </div>
-    <div class="content">
-      <p>
-        This website is under construction please check back in a few weeks to
-        learn more!!
-      </p>
-    </div>
-    <script src="script.js"></script>
+      </nav>
+    </aside>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="items.html">View Items</a>
+      <a href="report.html">Report Item</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+
+    <main>
+      <p>Use this website to report, find, and claim lost items at school.</p>
+    </main>
+    <script src="js/app.js"></script>
   </body>
+  <script>
+    (function () {
+      // try to load a local config.js (copy config.example.js -> config.js),
+      // if it fails and the site is served from whatsinthenest.com, default to same origin
+      var s = document.createElement("script");
+      s.src = "config.js";
+      s.onerror = function () {
+        if (location.hostname === "whatsinthenest.com")
+          window.APP_CONFIG = window.APP_CONFIG || { apiBase: location.origin };
+      };
+      document.head.appendChild(s);
+    })();
+  </script>
 </html>
