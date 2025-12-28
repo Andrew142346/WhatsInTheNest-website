@@ -6,43 +6,57 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <header>
-      <h1>Admin Settings</h1>
-    </header>
-
-    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
-      ☰
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
-    <aside class="sidebar" id="quickSidebar" aria-hidden="true">
-      <nav class="sidebar-nav">
+
+    <aside class="sidebar" id="sidebar">
+      <nav>
         <a href="index.html">Home</a>
         <a href="items.html">View Items</a>
         <a href="report.html">Report Item</a>
         <a href="admin.html">Admin</a>
-        <a href="settings.html">Settings</a>
-        <a href="stats.html">Statistics</a>
-        <hr />
-        <div class="sidebar-demo">
-          <button id="demoToastBtn" type="button">Show demo toast</button>
-          <button id="demoConfirmBtn" type="button">Show demo confirm</button>
-        </div>
+        <a href="settings.html" class="admin-only">Settings</a>
+        <a href="stats.html" class="admin-only">Statistics</a>
       </nav>
     </aside>
 
-    <main>
-      <section id="settingsLogin">
-        <h2>Admin login</h2>
-        <form id="settingsAdminForm">
+    <header>
+      <h1>Admin Settings</h1>
+    </header>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="items.html">View Items</a>
+      <a href="report.html">Report Item</a>
+      <a href="admin.html">Admin</a>
+      <a href="settings.html" class="admin-only" style="display: none"
+        >Settings</a
+      >
+      <a href="stats.html" class="admin-only" style="display: none"
+        >Statistics</a
+      >
+    </nav>
+
+    <!-- Login Modal -->
+    <div id="settingsLoginModal" class="login-modal" style="display: none">
+      <div class="login-modal-content">
+        <h2>Admin Login Required</h2>
+        <form id="settingsLoginForm">
           <input
             type="password"
-            id="settingsAdminPass"
+            id="settingsLoginPass"
             placeholder="Admin password"
             required
           />
           <button type="submit">Login</button>
         </form>
-      </section>
+      </div>
+    </div>
 
+    <main>
       <section id="settingsContent" style="display: none">
         <h2>Security</h2>
         <label for="newAdminPass">New admin password</label>

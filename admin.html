@@ -7,42 +7,140 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <header><h1>Admin Panel</h1></header>
-
-    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
-      ☰
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
-    <aside class="sidebar" id="quickSidebar" aria-hidden="true">
-      <nav class="sidebar-nav">
+
+    <aside class="sidebar" id="sidebar">
+      <nav>
         <a href="index.html">Home</a>
         <a href="items.html">View Items</a>
         <a href="report.html">Report Item</a>
         <a href="admin.html">Admin</a>
-        <hr />
-        <div class="sidebar-demo">
-          <button id="demoToastBtn" type="button">Show demo toast</button>
-          <button id="demoConfirmBtn" type="button">Show demo confirm</button>
-        </div>
+        <a href="settings.html" class="admin-only">Settings</a>
+        <a href="stats.html" class="admin-only">Statistics</a>
       </nav>
     </aside>
+
+    <header><h1>Admin Panel</h1></header>
+
     <nav>
       <a href="index.html">Home</a>
       <a href="items.html">View Items</a>
+      <a href="report.html">Report Item</a>
+      <a href="admin.html">Admin</a>
+      <a href="settings.html" class="admin-only">Settings</a>
+      <a href="stats.html" class="admin-only">Statistics</a>
     </nav>
 
+    <!-- Login Modal -->
+    <div id="adminLoginModal" class="login-modal" style="display: none">
+      <div class="login-modal-content">
+        <h2>Admin Login Required</h2>
+        <form id="adminLoginForm">
+          <input
+            type="password"
+            id="adminLoginPass"
+            placeholder="Admin password"
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </div>
+
     <main>
-      <form id="adminForm">
-        <input
-          type="password"
-          id="adminPass"
-          placeholder="Admin password"
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
-      <!-- Hidden until successful login -->
-      <!-- NOTE: password change moved to Settings page -->
-      <ul id="adminList"></ul>
+      <div id="adminContent" style="display: none">
+        <div class="admin-section">
+          <button class="section-toggle" id="togglePendingItems" type="button">
+            Pending Items (New Submissions) ▼
+          </button>
+          <div id="pendingItemsSection" style="display: none">
+            <input
+              id="pendingItemsSearch"
+              placeholder="Search pending items..."
+              aria-label="Search pending items"
+              style="
+                width: 100%;
+                max-width: 500px;
+                padding: 8px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+              "
+            />
+            <ul id="adminList"></ul>
+          </div>
+        </div>
+
+        <div class="admin-section">
+          <button class="section-toggle" id="toggleInquiries" type="button">
+            Inquiries ▼
+          </button>
+          <div id="inquiriesSection" style="display: none">
+            <input
+              id="inquiriesSearch"
+              placeholder="Search inquiries..."
+              aria-label="Search inquiries"
+              style="
+                width: 100%;
+                max-width: 500px;
+                padding: 8px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+              "
+            />
+            <ul id="inquiriesList"></ul>
+          </div>
+        </div>
+
+        <div class="admin-section">
+          <button class="section-toggle" id="toggleClaimRequests" type="button">
+            Pending Claim Requests ▼
+          </button>
+          <div id="claimRequestsSection" style="display: none">
+            <input
+              id="claimRequestsSearch"
+              placeholder="Search claim requests..."
+              aria-label="Search claim requests"
+              style="
+                width: 100%;
+                max-width: 500px;
+                padding: 8px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+              "
+            />
+            <ul id="claimRequestsList"></ul>
+          </div>
+        </div>
+
+        <div class="admin-section">
+          <button class="section-toggle" id="toggleClaimedItems" type="button">
+            Claimed Items ▼
+          </button>
+          <div id="claimedItemsSection" style="display: none">
+            <input
+              id="claimedItemsSearch"
+              placeholder="Search claimed items..."
+              aria-label="Search claimed items"
+              style="
+                width: 100%;
+                max-width: 500px;
+                padding: 8px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+              "
+            />
+            <ul id="claimedList"></ul>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script src="js/app.js"></script>

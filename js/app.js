@@ -28,6 +28,57 @@ var FileReader = (typeof globalThis !== 'undefined' ? globalThis.FileReader : un
 
 let items = JSON.parse(localStorage.getItem('lostItems')) || [];
 
+// Session-based admin login (persists across pages, resets when tab/window closes)
+function isAdminLoggedIn() {
+  return sessionStorage.getItem('adminLoggedIn') === 'true';
+}
+
+function setAdminLoggedIn() {
+  sessionStorage.setItem('adminLoggedIn', 'true');
+  showAdminLinks();
+}
+
+function showAdminLinks() {
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = 'block';
+  });
+}
+
+function hideAdminLinks() {
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = 'none';
+  });
+}
+
+/* --- Hamburger Menu --- */
+(function() {
+  const hamburger = document.getElementById('hamburgerBtn');
+  const sidebar = document.getElementById('sidebar');
+  
+  if (hamburger && sidebar) {
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      sidebar.classList.toggle('open');
+    });
+    
+    // Close sidebar when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains('open')) {
+        hamburger.classList.remove('open');
+        sidebar.classList.remove('open');
+      }
+    });
+    
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+        hamburger.classList.remove('open');
+        sidebar.classList.remove('open');
+      }
+    });
+  }
+})();
+
 // API mode detection: set ?api=<baseUrl> (e.g. ?api=http://localhost:3000) or window.APP_CONFIG = { apiBase: 'http://...' }
 const API_BASE = (function(){
   try{
@@ -143,7 +194,8 @@ function render(list = items) {
   if (!ul) return;
   ul.innerHTML = '';
   list.forEach((i) => {
-    if (!i.approved || i.resolved) return;
+    // Don't show if not approved, already resolved, or has a pending claim request
+    if (!i.approved || i.resolved || i.claimRequested) return;
     const origIndex = items.indexOf(i);
     ul.insertAdjacentHTML('beforeend',
       `<li>
@@ -151,6 +203,7 @@ function render(list = items) {
         ${i.photo ? `<img src="${i.photo}" class="item-photo">` : ''}
         <p>${i.desc}</p>
         <em>${i.location}</em><br>
+        <button class="inquireBtn" data-idx="${origIndex}" data-id="${i.id || ''}">Inquire</button>
         <button class="claimBtn" data-idx="${origIndex}" data-id="${i.id || ''}">Claim Item</button>
       </li>`);
   });
@@ -160,10 +213,39 @@ function render(list = items) {
     btn.addEventListener('click', async () => {
       const id = btn.dataset.id;
       const idx = Number(btn.dataset.idx);
+      
+      // Prompt for claimer name
+      const claimerName = prompt('Please enter your name to claim this item:');
+      if (!claimerName || claimerName.trim() === '') {
+        showToast('Name is required to claim an item.', 'error');
+        return;
+      }
+      
       if (apiEnabled() && id) {
-        try { await apiClaim(id); await refreshFromServer(); showToast('Item claimed.', 'success'); } catch (e){ showToast('Claim failed: '+e.message, 'error'); }
+        try { await apiClaim(id); await refreshFromServer(); showToast('Claim request submitted for approval.', 'success'); } catch (e){ showToast('Claim failed: '+e.message, 'error'); }
       } else {
-        claim(idx);
+        claim(idx, claimerName.trim());
+      }
+    });
+  });
+  
+  // attach inquire handlers
+  ul.querySelectorAll('.inquireBtn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const idx = Number(btn.dataset.idx);
+      
+      // Prompt for inquirer name
+      const inquirerName = prompt('Please enter your name and contact info:');
+      if (!inquirerName || inquirerName.trim() === '') {
+        showToast('Name is required to inquire about an item.', 'error');
+        return;
+      }
+      
+      if (apiEnabled() && id) {
+        showToast('API inquire not yet implemented', 'error');
+      } else {
+        inquire(idx, inquirerName.trim());
       }
     });
   });
@@ -171,63 +253,41 @@ function render(list = items) {
 
 if(apiEnabled()){ refreshFromServer().catch(()=>{ render(); }); } else { render(); }
 
-async function claim(x) {
+async function claim(x, claimerName) {
   // x may be an index (local mode) or an id string (server mode)
   if (apiEnabled() && typeof x === 'string'){
-    try{ await apiClaim(x); await refreshFromServer(); showToast('Item claimed.', 'success'); }catch(e){ showToast('Claim failed: '+e.message, 'error'); }
+    try{ await apiClaim(x); await refreshFromServer(); showToast('Claim request submitted for approval.', 'success'); }catch(e){ showToast('Claim failed: '+e.message, 'error'); }
     return;
   }
   if (typeof x !== 'number' || !items[x]) return showToast('Item not found.', 'error');
   if (items[x].resolved) return showToast('Item already claimed.', 'info');
-  items[x].resolved = true; save(); render(); showToast('Item claimed.', 'success');
+  if (items[x].claimRequested) return showToast('Claim request already pending.', 'info');
+  
+  items[x].claimRequested = true;
+  items[x].claimerName = claimerName;
+  items[x].claimRequestedAt = new Date().toISOString();
+  save(); 
+  render(); 
+  showToast('Claim request submitted for approval.', 'success');
 }
 
-/* --- Quick sidebar toggle --- */
-(function(){
-  function openSidebar(){
-    const sb = document.getElementById('quickSidebar');
-    if(!sb) return;
-    sb.classList.add('open');
-    sb.setAttribute('aria-hidden','false');
-  }
-  function closeSidebar(){
-    const sb = document.getElementById('quickSidebar');
-    if(!sb) return;
-    sb.classList.remove('open');
-    sb.setAttribute('aria-hidden','true');
-  }
-  const btn = document.getElementById('hamburgerBtn');
-  if(btn){
-    btn.addEventListener('click', ()=>{
-      const sb = document.getElementById('quickSidebar');
-      if(sb && sb.classList.contains('open')) closeSidebar(); else openSidebar();
-    });
-  }
-  // close when clicking outside sidebar
-  document.addEventListener('click', (ev)=>{
-    const sb = document.getElementById('quickSidebar');
-    if(!sb || !sb.classList.contains('open')) return;
-    const target = ev.target;
-    if(target.closest && !target.closest('.sidebar') && !target.closest('.hamburger')) closeSidebar();
+function inquire(idx, inquirerInfo) {
+  if (typeof idx !== 'number' || !items[idx]) return showToast('Item not found.', 'error');
+  if (items[idx].resolved) return showToast('Item already claimed.', 'info');
+  if (items[idx].claimRequested) return showToast('Item has pending claim request.', 'info');
+  
+  // Add inquiry to item
+  if (!items[idx].inquiries) items[idx].inquiries = [];
+  items[idx].inquiries.push({
+    inquirerInfo: inquirerInfo,
+    inquiredAt: new Date().toISOString()
   });
-  // close on Escape
-  document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') closeSidebar(); });
-})();
+  
+  save();
+  showToast('Inquiry submitted to admin.', 'success');
+}
 
-/* --- Demo button handlers (sidebar) --- */
-(function(){
-  const toastBtn = document.getElementById('demoToastBtn');
-  const confirmBtn = document.getElementById('demoConfirmBtn');
-  if(toastBtn){
-    toastBtn.addEventListener('click', ()=> showToast('This is a demo toast', 'info'));
-  }
-  if(confirmBtn){
-    confirmBtn.addEventListener('click', async ()=>{
-      const ok = await showConfirm('This is a demo confirm. Proceed?');
-      if(ok) showToast('Confirmed', 'success'); else showToast('Cancelled', 'info');
-    });
-  }
-})();
+
 
 const s = document.getElementById('searchInput');
 const c = document.getElementById('categoryFilter');
@@ -273,29 +333,61 @@ if (form) {
   });
 }
 
-const af = document.getElementById('adminForm');
-if (af) {
-  const adminPassEl = document.getElementById('adminPass');
-  const adminListEl = document.getElementById('adminList');
+// Admin page login modal
+const adminLoginModal = document.getElementById('adminLoginModal');
+const adminLoginForm = document.getElementById('adminLoginForm');
+const adminContent = document.getElementById('adminContent');
 
-  af.addEventListener('submit', (e) => {
+if (adminLoginModal && adminLoginForm && adminContent) {
+  const adminListEl = document.getElementById('adminList');
+  
+  // Show modal if not logged in
+  if (!isAdminLoggedIn()) {
+    adminLoginModal.style.display = 'flex';
+  } else {
+    adminContent.style.display = 'block';
+    showAdminLinks();
+  }
+  
+  adminLoginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (!adminPassEl) return;
+    const adminLoginPass = document.getElementById('adminLoginPass');
+    if (!adminLoginPass) return;
+    
     if (apiEnabled()){
-      apiAdminLogin(adminPassEl.value).then(()=>{
-        // refresh from server and render admin list
-        refreshFromServer().then(()=> populateAdminList()).catch(()=>{});
+      apiAdminLogin(adminLoginPass.value).then(()=>{
+        setAdminLoggedIn();
+        adminLoginModal.style.display = 'none';
+        adminContent.style.display = 'block';
+        refreshFromServer().then(()=> { populateAdminList(); populateClaimRequestsList(); populateClaimedList(); }).catch(()=>{});
       }).catch(()=> showToast('Wrong password', 'error'));
       return;
     }
-    if (adminPassEl.value !== getAdminPassword()) { showToast('Wrong password', 'error'); return; }
+    
+    if (adminLoginPass.value !== getAdminPassword()) { 
+      showToast('Wrong password', 'error'); 
+      return; 
+    }
+    
+    setAdminLoggedIn();
+    adminLoginModal.style.display = 'none';
+    adminContent.style.display = 'block';
+    showAdminLinks();
 
-    function populateAdminList(){
+    function populateAdminList(searchTerm = ''){
       if (!adminListEl) return;
       adminListEl.innerHTML = '';
       items.forEach((i) => {
         const idx = items.indexOf(i);
-        if (i.approved && !i.resolved) return; // skip already-approved & active items
+        // skip already-approved & active items, skip claimed items, skip items with pending claim requests
+        if ((i.approved && !i.resolved && !i.claimRequested) || i.resolved || i.claimRequested) return;
+        
+        // Apply search filter
+        if (searchTerm && !i.name.toLowerCase().includes(searchTerm) && 
+            !i.desc.toLowerCase().includes(searchTerm) && 
+            !i.category.toLowerCase().includes(searchTerm) &&
+            !i.location.toLowerCase().includes(searchTerm)) return;
+        
         const idAttr = i.id ? `data-id="${i.id}"` : `data-idx="${idx}"`;
         adminListEl.insertAdjacentHTML('beforeend',
           `<li ${idAttr} data-idx="${idx}">${i.name}
@@ -303,16 +395,309 @@ if (af) {
             <button class="deleteBtn" ${idAttr}>Delete</button>
           </li>`);
       });
+      if (adminListEl.children.length === 0) {
+        adminListEl.innerHTML = '<li><em>No pending items</em></li>';
+      }
     }
+    
+    function populateInquiriesList(searchTerm = ''){
+      const inquiriesListEl = document.getElementById('inquiriesList');
+      if (!inquiriesListEl) return;
+      inquiriesListEl.innerHTML = '';
+      
+      const itemsWithInquiries = [];
+      items.forEach((i) => {
+        if (!i.inquiries || i.inquiries.length === 0) return;
+        if (i.resolved) return; // Don't show inquiries for claimed items
+        
+        // Apply search filter
+        if (searchTerm && !i.name.toLowerCase().includes(searchTerm) && 
+            !i.desc.toLowerCase().includes(searchTerm) && 
+            !i.category.toLowerCase().includes(searchTerm) &&
+            !i.location.toLowerCase().includes(searchTerm)) return;
+        
+        itemsWithInquiries.push(i);
+      });
+      
+      if (itemsWithInquiries.length === 0) {
+        inquiriesListEl.innerHTML = '<li><em>No inquiries</em></li>';
+        return;
+      }
+      
+      itemsWithInquiries.forEach((i) => {
+        const idx = items.indexOf(i);
+        const idAttr = i.id ? `data-id="${i.id}"` : `data-idx="${idx}"`;
+        const inquiriesCount = i.inquiries.length;
+        const latestInquiry = i.inquiries[i.inquiries.length - 1];
+        inquiriesListEl.insertAdjacentHTML('beforeend',
+          `<li ${idAttr} data-idx="${idx}">
+            <strong>${i.name}</strong> - ${i.category}<br>
+            <em>${inquiriesCount} inquir${inquiriesCount === 1 ? 'y' : 'ies'}</em><br>
+            <button class="viewInquiriesBtn" ${idAttr}>View Inquiries</button>
+            <button class="clearInquiriesBtn" ${idAttr}>Clear All</button>
+          </li>`);
+      });
+      
+      // Attach view inquiries handlers
+      inquiriesListEl.querySelectorAll('.viewInquiriesBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.idx);
+          if (!items[idx] || !items[idx].inquiries) return;
+          
+          let message = `Inquiries for "${items[idx].name}":\n\n`;
+          items[idx].inquiries.forEach((inq, i) => {
+            const date = new Date(inq.inquiredAt).toLocaleString();
+            message += `${i + 1}. ${inq.inquirerInfo}\n   (${date})\n\n`;
+          });
+          
+          alert(message);
+        });
+      });
+      
+      // Attach clear inquiries handlers
+      inquiriesListEl.querySelectorAll('.clearInquiriesBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const idx = Number(btn.dataset.idx);
+          const ok = await showConfirm('Clear all inquiries for this item?');
+          if (!ok) return;
+          
+          if (items[idx]) {
+            items[idx].inquiries = [];
+            save();
+            populateInquiriesList(searchTerm);
+            showToast('Inquiries cleared', 'success');
+          }
+        });
+      });
+    }
+    
+    function populateClaimedList(searchTerm = ''){
+      const claimedListEl = document.getElementById('claimedList');
+      if (!claimedListEl) return;
+      claimedListEl.innerHTML = '';
+      const claimedItems = items.filter(i => {
+        if (!i.resolved) return false;
+        
+        // Apply search filter
+        if (searchTerm && !i.name.toLowerCase().includes(searchTerm) && 
+            !i.desc.toLowerCase().includes(searchTerm) && 
+            !i.category.toLowerCase().includes(searchTerm) &&
+            !i.location.toLowerCase().includes(searchTerm) &&
+            !(i.claimerName && i.claimerName.toLowerCase().includes(searchTerm))) return false;
+        
+        return true;
+      });
+      
+      if (claimedItems.length === 0) {
+        claimedListEl.innerHTML = '<li><em>No claimed items</em></li>';
+        return;
+      }
+      claimedItems.forEach((i) => {
+        const idx = items.indexOf(i);
+        const idAttr = i.id ? `data-id="${i.id}"` : `data-idx="${idx}"`;
+        const claimedDate = i.claimedAt ? ` (claimed ${new Date(i.claimedAt).toLocaleDateString()})` : '';
+        const claimerInfo = i.claimerName ? ` by ${i.claimerName}` : '';
+        claimedListEl.insertAdjacentHTML('beforeend',
+          `<li ${idAttr} data-idx="${idx}">
+            <strong>${i.name}</strong> - ${i.category}${claimerInfo}${claimedDate}
+            <button class="deleteClaimedBtn" ${idAttr}>Delete</button>
+          </li>`);
+      });
+      
+      // attach delete handlers for claimed items
+      claimedListEl.querySelectorAll('.deleteClaimedBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const idx = Number(btn.dataset.idx);
+          const ok = await showConfirm('Delete this claimed item?');
+          if (!ok) return;
+          if(apiEnabled() && id){ 
+            try{ await apiDelete(id); await refreshFromServer(); populateClaimedList(); showToast('Deleted', 'success'); }
+            catch(e){ showToast('Delete failed: '+e.message,'error'); }
+          } else { 
+            items.splice(idx, 1); save(); populateClaimedList(); showToast('Deleted', 'success'); 
+          }
+        });
+      });
+    }
+    
+    function populateClaimRequestsList(searchTerm = ''){
+      const claimRequestsListEl = document.getElementById('claimRequestsList');
+      if (!claimRequestsListEl) return;
+      claimRequestsListEl.innerHTML = '';
+      const claimRequests = items.filter(i => {
+        if (!i.claimRequested || i.resolved) return false;
+        
+        // Apply search filter
+        if (searchTerm && !i.name.toLowerCase().includes(searchTerm) && 
+            !i.desc.toLowerCase().includes(searchTerm) && 
+            !i.category.toLowerCase().includes(searchTerm) &&
+            !i.location.toLowerCase().includes(searchTerm) &&
+            !(i.claimerName && i.claimerName.toLowerCase().includes(searchTerm))) return false;
+        
+        return true;
+      });
+      
+      if (claimRequests.length === 0) {
+        claimRequestsListEl.innerHTML = '<li><em>No pending claim requests</em></li>';
+        return;
+      }
+      claimRequests.forEach((i) => {
+        const idx = items.indexOf(i);
+        const idAttr = i.id ? `data-id="${i.id}"` : `data-idx="${idx}"`;
+        const requestDate = i.claimRequestedAt ? ` (requested ${new Date(i.claimRequestedAt).toLocaleDateString()})` : '';
+        claimRequestsListEl.insertAdjacentHTML('beforeend',
+          `<li ${idAttr} data-idx="${idx}">
+            <strong>${i.name}</strong> - ${i.category}<br>
+            <em>Requested by: ${i.claimerName}${requestDate}</em><br>
+            <button class="approveClaimBtn" ${idAttr}>Approve Claim</button>
+            <button class="rejectClaimBtn" ${idAttr}>Reject Claim</button>
+          </li>`);
+      });
+      
+      // attach approve claim handlers
+      claimRequestsListEl.querySelectorAll('.approveClaimBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const idx = Number(btn.dataset.idx);
+          if(apiEnabled() && id){ 
+            // TODO: need backend endpoint for approving claims
+            showToast('API claim approval not yet implemented', 'error');
+          } else { 
+            items[idx].resolved = true;
+            items[idx].claimedAt = new Date().toISOString();
+            items[idx].claimRequested = false;
+            save(); 
+            populateAdminList();
+            populateClaimRequestsList();
+            populateClaimedList();
+            showToast(`Item approved for ${items[idx].claimerName}`, 'success'); 
+          }
+        });
+      });
+      
+      // attach reject claim handlers
+      claimRequestsListEl.querySelectorAll('.rejectClaimBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const idx = Number(btn.dataset.idx);
+          const ok = await showConfirm('Reject this claim request?');
+          if (!ok) return;
+          if(apiEnabled() && id){ 
+            // TODO: need backend endpoint for rejecting claims
+            showToast('API claim rejection not yet implemented', 'error');
+          } else { 
+            items[idx].claimRequested = false;
+            items[idx].claimerName = null;
+            items[idx].claimRequestedAt = null;
+            save(); 
+            populateAdminList();
+            populateClaimRequestsList();
+            render();
+            showToast('Claim request rejected', 'success'); 
+          }
+        });
+      });
+    }
+    
     populateAdminList();
+    populateInquiriesList();
+    populateClaimRequestsList();
+    populateClaimedList();
+    
+    // Setup section toggles
+    const togglePendingItems = document.getElementById('togglePendingItems');
+    const pendingItemsSection = document.getElementById('pendingItemsSection');
+    if (togglePendingItems && pendingItemsSection) {
+      togglePendingItems.addEventListener('click', () => {
+        if (pendingItemsSection.style.display === 'none') {
+          pendingItemsSection.style.display = 'block';
+          togglePendingItems.textContent = 'Pending Items (New Submissions) ▲';
+        } else {
+          pendingItemsSection.style.display = 'none';
+          togglePendingItems.textContent = 'Pending Items (New Submissions) ▼';
+        }
+      });
+    }
+    
+    const toggleInquiries = document.getElementById('toggleInquiries');
+    const inquiriesSection = document.getElementById('inquiriesSection');
+    if (toggleInquiries && inquiriesSection) {
+      toggleInquiries.addEventListener('click', () => {
+        if (inquiriesSection.style.display === 'none') {
+          inquiriesSection.style.display = 'block';
+          toggleInquiries.textContent = 'Inquiries ▲';
+        } else {
+          inquiriesSection.style.display = 'none';
+          toggleInquiries.textContent = 'Inquiries ▼';
+        }
+      });
+    }
+    
+    const toggleClaimRequests = document.getElementById('toggleClaimRequests');
+    const claimRequestsSection = document.getElementById('claimRequestsSection');
+    if (toggleClaimRequests && claimRequestsSection) {
+      toggleClaimRequests.addEventListener('click', () => {
+        if (claimRequestsSection.style.display === 'none') {
+          claimRequestsSection.style.display = 'block';
+          toggleClaimRequests.textContent = 'Pending Claim Requests ▲';
+        } else {
+          claimRequestsSection.style.display = 'none';
+          toggleClaimRequests.textContent = 'Pending Claim Requests ▼';
+        }
+      });
+    }
+    
+    const toggleClaimedItems = document.getElementById('toggleClaimedItems');
+    const claimedItemsSection = document.getElementById('claimedItemsSection');
+    if (toggleClaimedItems && claimedItemsSection) {
+      toggleClaimedItems.addEventListener('click', () => {
+        if (claimedItemsSection.style.display === 'none') {
+          claimedItemsSection.style.display = 'block';
+          toggleClaimedItems.textContent = 'Claimed Items ▲';
+        } else {
+          claimedItemsSection.style.display = 'none';
+          toggleClaimedItems.textContent = 'Claimed Items ▼';
+        }
+      });
+    }
+    
+    // Setup individual search bars
+    const pendingItemsSearch = document.getElementById('pendingItemsSearch');
+    if (pendingItemsSearch) {
+      pendingItemsSearch.addEventListener('input', () => {
+        populateAdminList(pendingItemsSearch.value.toLowerCase());
+      });
+    }
+    
+    const inquiriesSearch = document.getElementById('inquiriesSearch');
+    if (inquiriesSearch) {
+      inquiriesSearch.addEventListener('input', () => {
+        populateInquiriesList(inquiriesSearch.value.toLowerCase());
+      });
+    }
+    
+    const claimRequestsSearch = document.getElementById('claimRequestsSearch');
+    if (claimRequestsSearch) {
+      claimRequestsSearch.addEventListener('input', () => {
+        populateClaimRequestsList(claimRequestsSearch.value.toLowerCase());
+      });
+    }
+    
+    const claimedItemsSearch = document.getElementById('claimedItemsSearch');
+    if (claimedItemsSearch) {
+      claimedItemsSearch.addEventListener('input', () => {
+        populateClaimedList(claimedItemsSearch.value.toLowerCase());
+      });
+    }
 
     // attach admin handlers
     adminListEl.querySelectorAll('.approveBtn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.id;
         const idx = Number(btn.dataset.idx);
-        if(apiEnabled() && id){ try{ await apiApprove(id); await refreshFromServer(); showToast('Approved', 'success'); }catch(e){ showToast('Approve failed: '+e.message,'error'); } }
-        else { items[idx].approved = true; save(); populateAdminList(); showToast('Approved', 'success'); }
+        if(apiEnabled() && id){ try{ await apiApprove(id); await refreshFromServer(); populateClaimRequestsList(); populateClaimedList(); showToast('Approved', 'success'); }catch(e){ showToast('Approve failed: '+e.message,'error'); } }
+        else { items[idx].approved = true; save(); populateAdminList(); populateClaimRequestsList(); populateClaimedList(); showToast('Approved', 'success'); }
       });
     });
     adminListEl.querySelectorAll('.deleteBtn').forEach(btn => {
@@ -321,8 +706,8 @@ if (af) {
         const idx = Number(btn.dataset.idx);
         const ok = await showConfirm('Delete this item?');
         if (!ok) return;
-        if(apiEnabled() && id){ try{ await apiDelete(id); await refreshFromServer(); showToast('Deleted', 'success'); }catch(e){ showToast('Delete failed: '+e.message,'error'); } }
-        else { items.splice(idx, 1); save(); populateAdminList(); showToast('Deleted', 'success'); }
+        if(apiEnabled() && id){ try{ await apiDelete(id); await refreshFromServer(); populateClaimRequestsList(); populateClaimedList(); showToast('Deleted', 'success'); }catch(e){ showToast('Delete failed: '+e.message,'error'); } }
+        else { items.splice(idx, 1); save(); populateAdminList(); populateClaimRequestsList(); populateClaimedList(); showToast('Deleted', 'success'); }
       });
     });
 
@@ -349,20 +734,39 @@ if (af) {
   }
 }
 
-  /* --- Settings page handlers --- */
-  const settingsForm = document.getElementById('settingsAdminForm');
-  if(settingsForm){
-    const settingsPassEl = document.getElementById('settingsAdminPass');
-    const settingsContent = document.getElementById('settingsContent');
-    settingsForm.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      if(apiEnabled()){
-        apiAdminLogin(settingsPassEl.value).then(()=>{ settingsContent.style.display = 'block'; }).catch(()=> showToast('Wrong password', 'error'));
-        return;
-      }
-      if(settingsPassEl.value !== getAdminPassword()) return showToast('Wrong password', 'error');
-      settingsContent.style.display = 'block';
-    });
+/* --- Settings page handlers --- */
+const settingsLoginModal = document.getElementById('settingsLoginModal');
+const settingsLoginForm = document.getElementById('settingsLoginForm');
+const settingsContent = document.getElementById('settingsContent');
+
+if(settingsLoginModal && settingsLoginForm && settingsContent){
+  // Show modal if not logged in
+  if (!isAdminLoggedIn()) {
+    settingsLoginModal.style.display = 'flex';
+  } else {
+    settingsContent.style.display = 'block';
+    showAdminLinks();
+  }
+  
+  settingsLoginForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const settingsLoginPass = document.getElementById('settingsLoginPass');
+    if(!settingsLoginPass) return;
+    
+    if(apiEnabled()){
+      apiAdminLogin(settingsLoginPass.value).then(()=>{ 
+        setAdminLoggedIn();
+        settingsLoginModal.style.display = 'none';
+        settingsContent.style.display = 'block';
+      }).catch(()=> showToast('Wrong password', 'error'));
+      return;
+    }
+    
+    if(settingsLoginPass.value !== getAdminPassword()) return showToast('Wrong password', 'error');
+    setAdminLoggedIn();
+    settingsLoginModal.style.display = 'none';
+    settingsContent.style.display = 'block';
+  });
 
     const resetBtn = document.getElementById('resetDataBtn');
     if(resetBtn){
@@ -401,18 +805,18 @@ if (af) {
     }
   }
 
-  /* --- Stats rendering --- */
-  function renderStats(){
-    const totals = { total: 0, approved: 0, resolved: 0 };
-    const byCategory = {};
-    const byLocation = {};
-    items.forEach(i=>{
-      totals.total++;
-      if(i.approved) totals.approved++;
-      if(i.resolved) totals.resolved++;
-      byCategory[i.category] = (byCategory[i.category]||0)+1;
-      byLocation[i.location] = (byLocation[i.location]||0)+1;
-    });
+/* --- Stats rendering --- */
+function renderStats(){
+  const totals = { total: 0, approved: 0, resolved: 0 };
+  const byCategory = {};
+  const byLocation = {};
+  items.forEach(i=>{
+    totals.total++;
+    if(i.approved) totals.approved++;
+    if(i.resolved) totals.resolved++;
+    byCategory[i.category] = (byCategory[i.category]||0)+1;
+    byLocation[i.location] = (byLocation[i.location]||0)+1;
+  });
 
     const totalsEl = document.getElementById('statsTotals');
     if(totalsEl) totalsEl.innerHTML = `<p>Total reported: ${totals.total}</p><p>Approved: ${totals.approved}</p><p>Resolved: ${totals.resolved}</p>`;
@@ -486,7 +890,49 @@ if (af) {
           locEl.appendChild(svg);
         }
     }
-  }
+}
 
-  // call renderStats on pages that include stats
-  if(document.getElementById('statsTotals')) renderStats();
+// Stats page login modal
+const statsLoginModal = document.getElementById('statsLoginModal');
+const statsLoginForm = document.getElementById('statsLoginForm');
+const statsMain = document.querySelector('#statsSummary');
+
+if(statsLoginModal && statsLoginForm) {
+  // Show modal if not logged in
+  if (!isAdminLoggedIn()) {
+    statsLoginModal.style.display = 'flex';
+    if(statsMain) statsMain.parentElement.style.display = 'none';
+  } else {
+    showAdminLinks();
+    if(document.getElementById('statsTotals')) renderStats();
+  }
+  
+  statsLoginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const statsLoginPass = document.getElementById('statsLoginPass');
+    if (!statsLoginPass) return;
+    
+    if (apiEnabled()){
+      apiAdminLogin(statsLoginPass.value).then(()=>{
+        setAdminLoggedIn();
+        statsLoginModal.style.display = 'none';
+        if(statsMain) statsMain.parentElement.style.display = 'block';
+        if(document.getElementById('statsTotals')) renderStats();
+      }).catch(()=> showToast('Wrong password', 'error'));
+      return;
+    }
+    
+    if (statsLoginPass.value !== getAdminPassword()) { 
+      showToast('Wrong password', 'error'); 
+      return; 
+    }
+    
+    setAdminLoggedIn();
+    statsLoginModal.style.display = 'none';
+    if(statsMain) statsMain.parentElement.style.display = 'block';
+    showAdminLinks();
+    if(document.getElementById('statsTotals')) renderStats();
+  });
+} else if(document.getElementById('statsTotals') && isAdminLoggedIn()) {
+  renderStats();
+}

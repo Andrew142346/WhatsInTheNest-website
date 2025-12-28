@@ -6,21 +6,53 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <header><h1>Statistics</h1></header>
-
-    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
-      ☰
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
-    <aside class="sidebar" id="quickSidebar" aria-hidden="true">
-      <nav class="sidebar-nav">
+
+    <aside class="sidebar" id="sidebar">
+      <nav>
         <a href="index.html">Home</a>
         <a href="items.html">View Items</a>
         <a href="report.html">Report Item</a>
         <a href="admin.html">Admin</a>
-        <a href="settings.html">Settings</a>
-        <a href="stats.html">Statistics</a>
+        <a href="settings.html" class="admin-only">Settings</a>
+        <a href="stats.html" class="admin-only">Statistics</a>
       </nav>
     </aside>
+
+    <header><h1>Statistics</h1></header>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="items.html">View Items</a>
+      <a href="report.html">Report Item</a>
+      <a href="admin.html">Admin</a>
+      <a href="settings.html" class="admin-only" style="display: none"
+        >Settings</a
+      >
+      <a href="stats.html" class="admin-only" style="display: none"
+        >Statistics</a
+      >
+    </nav>
+
+    <!-- Login Modal -->
+    <div id="statsLoginModal" class="login-modal" style="display: none">
+      <div class="login-modal-content">
+        <h2>Admin Login Required</h2>
+        <form id="statsLoginForm">
+          <input
+            type="password"
+            id="statsLoginPass"
+            placeholder="Admin password"
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </div>
 
     <main>
       <section id="statsSummary">

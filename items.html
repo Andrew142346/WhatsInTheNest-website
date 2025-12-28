@@ -7,23 +7,24 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <header><h1>Found Items</h1></header>
-    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
-      ☰
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
-    <aside class="sidebar" id="quickSidebar" aria-hidden="true">
-      <nav class="sidebar-nav">
+
+    <aside class="sidebar" id="sidebar">
+      <nav>
         <a href="index.html">Home</a>
         <a href="items.html">View Items</a>
         <a href="report.html">Report Item</a>
         <a href="admin.html">Admin</a>
-        <hr />
-        <div class="sidebar-demo">
-          <button id="demoToastBtn" type="button">Show demo toast</button>
-          <button id="demoConfirmBtn" type="button">Show demo confirm</button>
-        </div>
+        <a href="settings.html" class="admin-only">Settings</a>
+        <a href="stats.html" class="admin-only">Statistics</a>
       </nav>
     </aside>
+
+    <header><h1>Found Items</h1></header>
 
     <nav>
       <a href="index.html">Home</a>
