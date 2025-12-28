@@ -120,21 +120,23 @@ function hideAdminLinks() {
 })();
 
 // API mode detection: set ?api=<baseUrl> (e.g. ?api=http://localhost:3000) or window.APP_CONFIG = { apiBase: 'http://...' }
-const API_BASE = (function(){
+function getApiBase(){
   try{
     const p = new URLSearchParams(location.search).get('api');
     if(p) return p;
     return (window.APP_CONFIG && window.APP_CONFIG.apiBase) || null;
   }catch(e){ return null; }
-})();
+}
 
 function apiEnabled(){ 
-  const enabled = !!API_BASE;
-  console.log('[API Debug] API Enabled:', enabled, 'API Base:', API_BASE);
+  const base = getApiBase();
+  const enabled = !!base;
+  console.log('[API Debug] API Enabled:', enabled, 'API Base:', base, 'window.APP_CONFIG:', window.APP_CONFIG);
   return enabled;
 }
 
 async function apiFetch(method, path, body){
+  const API_BASE = getApiBase();
   if(!API_BASE) throw new Error('API not configured');
   const url = API_BASE.replace(/\/$/, '') + path;
   const opts = { method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
