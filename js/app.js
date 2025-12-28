@@ -1,7 +1,72 @@
 /* Application logic */
 const DEFAULT_ADMIN_PASSWORD = 'teacher123';
 
+const DEFAULT_LOCATIONS = [
+  'New Gym',
+  'Old Gym',
+  "Bay's Locker Room",
+  'Girls Locker Room',
+  'High School Hallway',
+  'Elementary Hallway',
+  'Music Room',
+  'Science Room',
+  'Art Room',
+  'Lunch Room',
+  'Teacher Work Room',
+  'First Grade Room',
+  'Second Grade Room',
+  'Third Grade Room',
+  'Fourth Grade Room',
+  'Fifth Grade Room',
+  'Sixth Grade Room',
+  'Pre-K Room',
+  'Kindergarten Room',
+  'History Room',
+  'English Room',
+  'Computer Room',
+  'Math Room',
+  'Other'
+];
+
 let items = JSON.parse(localStorage.getItem('lostItems')) || [];
+
+function getLocations() {
+  const stored = localStorage.getItem('customLocations');
+  if (!stored) {
+    localStorage.setItem('customLocations', JSON.stringify(DEFAULT_LOCATIONS));
+    return DEFAULT_LOCATIONS.slice();
+  }
+  return JSON.parse(stored);
+}
+
+function saveLocations(locations) {
+  localStorage.setItem('customLocations', JSON.stringify(locations));
+}
+
+function addLocation(locationName) {
+  const locations = getLocations();
+  const trimmed = locationName.trim();
+  if (!trimmed) return false;
+  if (locations.includes(trimmed)) {
+    showToast('Location already exists', 'error');
+    return false;
+  }
+  locations.push(trimmed);
+  locations.sort();
+  saveLocations(locations);
+  return true;
+}
+
+function removeLocation(locationName) {
+  const locations = getLocations();
+  const index = locations.indexOf(locationName);
+  if (index > -1) {
+    locations.splice(index, 1);
+    saveLocations(locations);
+    return true;
+  }
+  return false;
+}
 
 // Session-based admin login (persists across pages, resets when tab/window closes)
 function isAdminLoggedIn() {
@@ -271,6 +336,18 @@ if (form) {
   const itemCategoryEl = document.getElementById('itemCategory');
   const itemLocationEl = document.getElementById('itemLocation');
   const itemPhotoEl = document.getElementById('itemPhoto');
+  
+  // Populate location datalist
+  const locationDatalist = document.getElementById('locationOptions');
+  if (locationDatalist) {
+    const locations = getLocations();
+    locationDatalist.innerHTML = '';
+    locations.forEach(loc => {
+      const option = document.createElement('option');
+      option.value = loc;
+      locationDatalist.appendChild(option);
+    });
+  }
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -851,6 +928,70 @@ if(settingsLoginModal && settingsLoginForm && settingsContent){
           setAdminPassword(val);
           showToast('Admin password updated.', 'success');
           settingsNewPassEl.value = '';
+        }
+      });
+    }
+    
+    // Location management handlers
+    function populateLocationsList() {
+      const locationsList = document.getElementById('locationsList');
+      if (!locationsList) return;
+      
+      const locations = getLocations();
+      locationsList.innerHTML = '';
+      
+      locations.forEach(loc => {
+        const li = document.createElement('li');
+        li.style.padding = '8px';
+        li.style.borderBottom = '1px solid #ddd';
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        
+        const span = document.createElement('span');
+        span.textContent = loc;
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.className = 'danger';
+        deleteBtn.style.padding = '4px 12px';
+        deleteBtn.style.fontSize = '0.9rem';
+        deleteBtn.addEventListener('click', async () => {
+          const ok = await showConfirm(`Delete location "${loc}"?`);
+          if (!ok) return;
+          
+          if (removeLocation(loc)) {
+            showToast('Location deleted', 'success');
+            populateLocationsList();
+          } else {
+            showToast('Failed to delete location', 'error');
+          }
+        });
+        
+        li.appendChild(span);
+        li.appendChild(deleteBtn);
+        locationsList.appendChild(li);
+      });
+    }
+    
+    const addLocationBtn = document.getElementById('addLocationBtn');
+    const newLocationInput = document.getElementById('newLocationInput');
+    if (addLocationBtn && newLocationInput) {
+      populateLocationsList();
+      
+      addLocationBtn.addEventListener('click', () => {
+        const locationName = newLocationInput.value;
+        if (addLocation(locationName)) {
+          showToast('Location added', 'success');
+          newLocationInput.value = '';
+          populateLocationsList();
+        }
+      });
+      
+      newLocationInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addLocationBtn.click();
         }
       });
     }

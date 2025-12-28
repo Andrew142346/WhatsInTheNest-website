@@ -49,7 +49,14 @@
         </select>
 
         <label for="itemLocation">Location found</label>
-        <input id="itemLocation" placeholder="Location found" required />
+        <input
+          id="itemLocation"
+          list="locationOptions"
+          placeholder="Start typing or select a location"
+          required
+          autocomplete="off"
+        />
+        <datalist id="locationOptions"> </datalist>
 
         <label for="itemPhoto">Photo (optional)</label>
         <input type="file" id="itemPhoto" accept="image/*" />
