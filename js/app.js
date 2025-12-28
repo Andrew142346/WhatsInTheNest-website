@@ -368,7 +368,14 @@ if (form) {
         createdAt: new Date().toISOString()
       };
       if(apiEnabled()){
-        apiReportItem(newItem).then(()=>{ showToast('Submitted for approval.', 'success'); form.reset(); refreshFromServer(); }).catch(e=> showToast('Submit failed: '+e.message,'error'));
+        apiReportItem(newItem).then(()=>{ 
+          showToast('Submitted for approval.', 'success'); 
+          form.reset(); 
+          refreshFromServer(); 
+        }).catch(e=> {
+          console.error('Submit failed:', e);
+          showToast('Submit failed: '+e.message,'error', 5000);
+        });
       } else {
         items.push(newItem);
         save(); showToast('Submitted for approval.', 'success'); form.reset();
