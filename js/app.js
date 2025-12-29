@@ -459,7 +459,10 @@ if (adminLoginModal && adminLoginForm && adminContent) {
         const latestInquiry = i.inquiries[i.inquiries.length - 1];
         inquiriesListEl.insertAdjacentHTML('beforeend',
           `<li ${idAttr} data-idx="${idx}">
-            <strong>${i.name}</strong> - ${i.category}<br>
+            <strong>${i.name}</strong> - ${i.category}
+            ${i.photo ? `<img src="${i.photo}" class="item-photo">` : ''}
+            <p>${i.desc}</p>
+            <em>${i.location}</em><br>
             <em>${inquiriesCount} inquir${inquiriesCount === 1 ? 'y' : 'ies'}</em><br>
             <button class="viewInquiriesBtn" ${idAttr}>View Inquiries</button>
             <button class="clearInquiriesBtn" ${idAttr}>Clear All</button>
@@ -613,7 +616,11 @@ if (adminLoginModal && adminLoginForm && adminContent) {
         const claimerInfo = i.claimerName ? ` by ${i.claimerName}` : '';
         claimedListEl.insertAdjacentHTML('beforeend',
           `<li ${idAttr} data-idx="${idx}">
-            <strong>${i.name}</strong> - ${i.category}${claimerInfo}${claimedDate}
+            <strong>${i.name}</strong> - ${i.category}
+            ${i.photo ? `<img src="${i.photo}" class="item-photo">` : ''}
+            <p>${i.desc}</p>
+            <em>${i.location}</em><br>
+            <em>${claimerInfo}${claimedDate}</em><br>
             <button class="deleteClaimedBtn" ${idAttr}>Delete</button>
           </li>`);
       });
@@ -662,7 +669,10 @@ if (adminLoginModal && adminLoginForm && adminContent) {
         const requestDate = i.claimRequestedAt ? ` (requested ${new Date(i.claimRequestedAt).toLocaleDateString()})` : '';
         claimRequestsListEl.insertAdjacentHTML('beforeend',
           `<li ${idAttr} data-idx="${idx}">
-            <strong>${i.name}</strong> - ${i.category}<br>
+            <strong>${i.name}</strong> - ${i.category}
+            ${i.photo ? `<img src="${i.photo}" class="item-photo">` : ''}
+            <p>${i.desc}</p>
+            <em>${i.location}</em><br>
             <em>Requested by: ${i.claimerName}${requestDate}</em><br>
             <button class="approveClaimBtn" ${idAttr}>Approve Claim</button>
             <button class="rejectClaimBtn" ${idAttr}>Reject Claim</button>
