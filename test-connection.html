@@ -1,24 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API Connection Test</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
-        .status { padding: 15px; margin: 10px 0; border-radius: 4px; }
-        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
-        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
-        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
-        pre { background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; }
-        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+      .status {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+      }
+      .success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+      }
+      pre {
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>🔍 API Connection Diagnostic</h1>
-    
+
     <div id="config-status" class="status info">
-        <strong>Loading configuration...</strong>
+      <strong>Loading configuration...</strong>
     </div>
 
     <div id="results"></div>
@@ -30,92 +60,121 @@
 
     <script src="config.js"></script>
     <script>
-        const API_BASE = window.APP_CONFIG?.apiBase || 'https://whatsinthenest-backend-production.up.railway.app';
-        
-        function log(message, type = 'info') {
-            const div = document.createElement('div');
-            div.className = `status ${type}`;
-            div.innerHTML = message;
-            document.getElementById('results').appendChild(div);
-        }
+      const API_BASE =
+        window.APP_CONFIG?.apiBase ||
+        "https://whatsinthenest-backend-production.up.railway.app";
 
-        // Show configuration
-        document.getElementById('config-status').innerHTML = `
+      function log(message, type = "info") {
+        const div = document.createElement("div");
+        div.className = `status ${type}`;
+        div.innerHTML = message;
+        document.getElementById("results").appendChild(div);
+      }
+
+      // Show configuration
+      document.getElementById("config-status").innerHTML = `
             <strong>Configuration Loaded</strong><br>
             API Base: <code>${API_BASE}</code><br>
             Current Origin: <code>${location.origin}</code><br>
-            window.APP_CONFIG: <pre>${JSON.stringify(window.APP_CONFIG, null, 2)}</pre>
+            window.APP_CONFIG: <pre>${JSON.stringify(
+              window.APP_CONFIG,
+              null,
+              2
+            )}</pre>
         `;
-        document.getElementById('config-status').className = 'status success';
+      document.getElementById("config-status").className = "status success";
 
-        async function testHealth() {
-            try {
-                log('Testing health endpoint...', 'info');
-                const response = await fetch(`${API_BASE}/api/health`, {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                log(`✅ Health check successful!<pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
-            } catch (error) {
-                log(`❌ Health check failed: ${error.message}`, 'error');
-                console.error('Health check error:', error);
-            }
+      async function testHealth() {
+        try {
+          log("Testing health endpoint...", "info");
+          const response = await fetch(`${API_BASE}/api/health`, {
+            method: "GET",
+            credentials: "include",
+          });
+          const data = await response.json();
+          log(
+            `✅ Health check successful!<pre>${JSON.stringify(
+              data,
+              null,
+              2
+            )}</pre>`,
+            "success"
+          );
+        } catch (error) {
+          log(`❌ Health check failed: ${error.message}`, "error");
+          console.error("Health check error:", error);
         }
+      }
 
-        async function testReport() {
-            try {
-                log('Testing report endpoint...', 'info');
-                const testItem = {
-                    name: 'Test Item',
-                    desc: 'This is a test',
-                    category: 'Other',
-                    location: 'Test Location',
-                    photo: null
-                };
-                const response = await fetch(`${API_BASE}/api/report`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(testItem)
-                });
-                const data = await response.json();
-                log(`✅ Report successful!<pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
-            } catch (error) {
-                log(`❌ Report failed: ${error.message}`, 'error');
-                console.error('Report error:', error);
-            }
+      async function testReport() {
+        try {
+          log("Testing report endpoint...", "info");
+          const testItem = {
+            name: "Test Item",
+            desc: "This is a test",
+            category: "Other",
+            location: "Test Location",
+            photo: null,
+          };
+          const response = await fetch(`${API_BASE}/api/report`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(testItem),
+          });
+          const data = await response.json();
+          log(
+            `✅ Report successful!<pre>${JSON.stringify(data, null, 2)}</pre>`,
+            "success"
+          );
+        } catch (error) {
+          log(`❌ Report failed: ${error.message}`, "error");
+          console.error("Report error:", error);
         }
+      }
 
-        async function testCORS() {
-            log('Testing CORS configuration...', 'info');
-            try {
-                const response = await fetch(`${API_BASE}/api/health`, {
-                    method: 'OPTIONS',
-                    headers: {
-                        'Origin': location.origin,
-                        'Access-Control-Request-Method': 'POST'
-                    }
-                });
-                const corsHeaders = {
-                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
-                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
-                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials')
-                };
-                log(`✅ CORS Headers:<pre>${JSON.stringify(corsHeaders, null, 2)}</pre>`, 'success');
-            } catch (error) {
-                log(`❌ CORS test failed: ${error.message}`, 'error');
-                console.error('CORS error:', error);
-            }
+      async function testCORS() {
+        log("Testing CORS configuration...", "info");
+        try {
+          const response = await fetch(`${API_BASE}/api/health`, {
+            method: "OPTIONS",
+            headers: {
+              Origin: location.origin,
+              "Access-Control-Request-Method": "POST",
+            },
+          });
+          const corsHeaders = {
+            "Access-Control-Allow-Origin": response.headers.get(
+              "Access-Control-Allow-Origin"
+            ),
+            "Access-Control-Allow-Methods": response.headers.get(
+              "Access-Control-Allow-Methods"
+            ),
+            "Access-Control-Allow-Credentials": response.headers.get(
+              "Access-Control-Allow-Credentials"
+            ),
+          };
+          log(
+            `✅ CORS Headers:<pre>${JSON.stringify(
+              corsHeaders,
+              null,
+              2
+            )}</pre>`,
+            "success"
+          );
+        } catch (error) {
+          log(`❌ CORS test failed: ${error.message}`, "error");
+          console.error("CORS error:", error);
         }
+      }
 
-        // Auto-run tests on load
-        window.onload = () => {
-            setTimeout(() => {
-                testHealth();
-                setTimeout(testCORS, 500);
-            }, 500);
-        };
+      // Auto-run tests on load
+      window.onload = () => {
+        setTimeout(() => {
+          testHealth();
+          setTimeout(testCORS, 500);
+        }, 500);
+      };
     </script>
-</body>
+  </body>
 </html>

@@ -39,20 +39,7 @@
     <main>
       <p>Use this website to report, find, and claim lost items at school.</p>
     </main>
+    <script src="config.js"></script>
     <script src="js/app.js"></script>
   </body>
-
-  <script>
-    (function () {
-      // try to load a local config.js (copy config.example.js -> config.js),
-      // if it fails and the site is served from whatsinthenest.com, default to same origin
-      var s = document.createElement("script");
-      s.src = "config.js";
-      s.onerror = function () {
-        if (location.hostname === "whatsinthenest.com")
-          window.APP_CONFIG = window.APP_CONFIG || { apiBase: location.origin };
-      };
-      document.head.appendChild(s);
-    })();
-  </script>
 </html>

@@ -115,19 +115,7 @@
       </div>
     </main>
 
+    <script src="config.js"></script>
     <script src="js/app.js"></script>
-    <script>
-      (function () {
-        var s = document.createElement("script");
-        s.src = "config.js";
-        s.onerror = function () {
-          if (location.hostname === "whatsinthenest.com")
-            window.APP_CONFIG = window.APP_CONFIG || {
-              apiBase: location.origin,
-            };
-        };
-        document.head.appendChild(s);
-      })();
-    </script>
   </body>
 </html>
