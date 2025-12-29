@@ -398,40 +398,7 @@ const adminContent = document.getElementById('adminContent');
 if (adminLoginModal && adminLoginForm && adminContent) {
   const adminListEl = document.getElementById('adminList');
   
-  // Show modal if not logged in
-  if (!isAdminLoggedIn()) {
-    adminLoginModal.style.display = 'flex';
-  } else {
-    adminContent.style.display = 'block';
-    showAdminLinks();
-  }
-  
-  adminLoginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const adminLoginPass = document.getElementById('adminLoginPass');
-    if (!adminLoginPass) return;
-    
-    if (apiEnabled()){
-      apiAdminLogin(adminLoginPass.value).then(()=>{
-        setAdminLoggedIn();
-        adminLoginModal.style.display = 'none';
-        adminContent.style.display = 'block';
-        refreshFromServer().then(()=> { populateAdminList(); populateClaimRequestsList(); populateClaimedList(); }).catch(()=>{});
-      }).catch(()=> showToast('Wrong password', 'error'));
-      return;
-    }
-    
-    if (adminLoginPass.value !== getAdminPassword()) { 
-      showToast('Wrong password', 'error'); 
-      return; 
-    }
-    
-    setAdminLoggedIn();
-    adminLoginModal.style.display = 'none';
-    adminContent.style.display = 'block';
-    showAdminLinks();
-
-    function populateAdminList(searchTerm = ''){
+  function populateAdminList(searchTerm = ''){
       if (!adminListEl) return;
       adminListEl.innerHTML = '';
       items.forEach((i) => {
@@ -741,6 +708,10 @@ if (adminLoginModal && adminLoginForm && adminContent) {
       });
     }
     
+  }
+  
+  // Setup admin UI - called on load if already logged in, or after login
+  function setupAdminUI() {
     populateAdminList();
     populateInquiriesList();
     populateClaimRequestsList();
@@ -855,6 +826,42 @@ if (adminLoginModal && adminLoginForm && adminContent) {
     // reveal password-change UI if present
     const cp = document.getElementById('changePasswordSection');
     if (cp) cp.style.display = 'block';
+  }
+  
+  // Show modal if not logged in
+  if (!isAdminLoggedIn()) {
+    adminLoginModal.style.display = 'flex';
+  } else {
+    adminContent.style.display = 'block';
+    showAdminLinks();
+    setupAdminUI();
+  }
+  
+  adminLoginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const adminLoginPass = document.getElementById('adminLoginPass');
+    if (!adminLoginPass) return;
+    
+    if (apiEnabled()){
+      apiAdminLogin(adminLoginPass.value).then(()=>{
+        setAdminLoggedIn();
+        adminLoginModal.style.display = 'none';
+        adminContent.style.display = 'block';
+        refreshFromServer().then(()=> { setupAdminUI(); }).catch(()=>{ setupAdminUI(); });
+      }).catch(()=> showToast('Wrong password', 'error'));
+      return;
+    }
+    
+    if (adminLoginPass.value !== getAdminPassword()) { 
+      showToast('Wrong password', 'error'); 
+      return; 
+    }
+    
+    setAdminLoggedIn();
+    adminLoginModal.style.display = 'none';
+    adminContent.style.display = 'block';
+    showAdminLinks();
+    setupAdminUI();
   });
 
   // handle password change (works whether UI is present or not)
