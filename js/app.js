@@ -707,8 +707,6 @@ if (adminLoginModal && adminLoginForm && adminContent) {
         });
       });
     }
-    
-  }
   
   // Setup admin UI - called on load if already logged in, or after login
   function setupAdminUI() {
