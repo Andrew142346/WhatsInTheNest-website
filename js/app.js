@@ -414,7 +414,11 @@ if (adminLoginModal && adminLoginForm && adminContent) {
         
         const idAttr = i.id ? `data-id="${i.id}"` : `data-idx="${idx}"`;
         adminListEl.insertAdjacentHTML('beforeend',
-          `<li ${idAttr} data-idx="${idx}">${i.name}
+          `<li ${idAttr} data-idx="${idx}">
+            <strong>${i.name}</strong> (${i.category})
+            ${i.photo ? `<img src="${i.photo}" class="item-photo">` : ''}
+            <p>${i.desc}</p>
+            <em>${i.location}</em><br>
             <button class="approveBtn" ${idAttr}>Approve</button>
             <button class="deleteBtn" ${idAttr}>Delete</button>
           </li>`);
