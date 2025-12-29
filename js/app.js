@@ -751,11 +751,11 @@ if (adminLoginModal && adminLoginForm && adminContent) {
     const pendingItemsSection = document.getElementById('pendingItemsSection');
     if (togglePendingItems && pendingItemsSection) {
       togglePendingItems.addEventListener('click', () => {
-        if (pendingItemsSection.style.display === 'none') {
-          pendingItemsSection.style.display = 'block';
+        if (pendingItemsSection.classList.contains('hidden')) {
+          pendingItemsSection.classList.remove('hidden');
           togglePendingItems.textContent = 'Pending Items (New Submissions) ▲';
         } else {
-          pendingItemsSection.style.display = 'none';
+          pendingItemsSection.classList.add('hidden');
           togglePendingItems.textContent = 'Pending Items (New Submissions) ▼';
         }
       });
@@ -765,11 +765,11 @@ if (adminLoginModal && adminLoginForm && adminContent) {
     const inquiriesSection = document.getElementById('inquiriesSection');
     if (toggleInquiries && inquiriesSection) {
       toggleInquiries.addEventListener('click', () => {
-        if (inquiriesSection.style.display === 'none') {
-          inquiriesSection.style.display = 'block';
+        if (inquiriesSection.classList.contains('hidden')) {
+          inquiriesSection.classList.remove('hidden');
           toggleInquiries.textContent = 'Inquiries ▲';
         } else {
-          inquiriesSection.style.display = 'none';
+          inquiriesSection.classList.add('hidden');
           toggleInquiries.textContent = 'Inquiries ▼';
         }
       });
@@ -779,11 +779,11 @@ if (adminLoginModal && adminLoginForm && adminContent) {
     const claimRequestsSection = document.getElementById('claimRequestsSection');
     if (toggleClaimRequests && claimRequestsSection) {
       toggleClaimRequests.addEventListener('click', () => {
-        if (claimRequestsSection.style.display === 'none') {
-          claimRequestsSection.style.display = 'block';
+        if (claimRequestsSection.classList.contains('hidden')) {
+          claimRequestsSection.classList.remove('hidden');
           toggleClaimRequests.textContent = 'Pending Claim Requests ▲';
         } else {
-          claimRequestsSection.style.display = 'none';
+          claimRequestsSection.classList.add('hidden');
           toggleClaimRequests.textContent = 'Pending Claim Requests ▼';
         }
       });
@@ -793,11 +793,11 @@ if (adminLoginModal && adminLoginForm && adminContent) {
     const claimedItemsSection = document.getElementById('claimedItemsSection');
     if (toggleClaimedItems && claimedItemsSection) {
       toggleClaimedItems.addEventListener('click', () => {
-        if (claimedItemsSection.style.display === 'none') {
-          claimedItemsSection.style.display = 'block';
+        if (claimedItemsSection.classList.contains('hidden')) {
+          claimedItemsSection.classList.remove('hidden');
           toggleClaimedItems.textContent = 'Claimed Items ▲';
         } else {
-          claimedItemsSection.style.display = 'none';
+          claimedItemsSection.classList.add('hidden');
           toggleClaimedItems.textContent = 'Claimed Items ▼';
         }
       });
