@@ -426,6 +426,26 @@ if (adminLoginModal && adminLoginForm && adminContent) {
       if (adminListEl.children.length === 0) {
         adminListEl.innerHTML = '<li><em>No pending items</em></li>';
       }
+      
+      // Attach handlers to the newly created buttons
+      adminListEl.querySelectorAll('.approveBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const idx = Number(btn.dataset.idx);
+          if(apiEnabled() && id){ try{ await apiApprove(id); await refreshFromServer(); populateAdminList(); populateClaimRequestsList(); populateClaimedList(); showToast('Approved', 'success'); }catch(e){ showToast('Approve failed: '+e.message,'error'); } }
+          else { items[idx].approved = true; save(); populateAdminList(); populateClaimRequestsList(); populateClaimedList(); showToast('Approved', 'success'); }
+        });
+      });
+      adminListEl.querySelectorAll('.deleteBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const idx = Number(btn.dataset.idx);
+          const ok = await showConfirm('Delete this item?');
+          if (!ok) return;
+          if(apiEnabled() && id){ try{ await apiDelete(id); await refreshFromServer(); populateAdminList(); populateClaimRequestsList(); populateClaimedList(); showToast('Deleted', 'success'); }catch(e){ showToast('Delete failed: '+e.message,'error'); } }
+          else { items.splice(idx, 1); save(); populateAdminList(); populateClaimRequestsList(); populateClaimedList(); showToast('Deleted', 'success'); }
+        });
+      });
     }
     
     function populateInquiriesList(searchTerm = ''){
@@ -814,26 +834,6 @@ if (adminLoginModal && adminLoginForm && adminContent) {
         populateClaimedList(claimedItemsSearch.value.toLowerCase());
       });
     }
-
-    // attach admin handlers
-    adminListEl.querySelectorAll('.approveBtn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const idx = Number(btn.dataset.idx);
-        if(apiEnabled() && id){ try{ await apiApprove(id); await refreshFromServer(); populateClaimRequestsList(); populateClaimedList(); showToast('Approved', 'success'); }catch(e){ showToast('Approve failed: '+e.message,'error'); } }
-        else { items[idx].approved = true; save(); populateAdminList(); populateClaimRequestsList(); populateClaimedList(); showToast('Approved', 'success'); }
-      });
-    });
-    adminListEl.querySelectorAll('.deleteBtn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const idx = Number(btn.dataset.idx);
-        const ok = await showConfirm('Delete this item?');
-        if (!ok) return;
-        if(apiEnabled() && id){ try{ await apiDelete(id); await refreshFromServer(); populateClaimRequestsList(); populateClaimedList(); showToast('Deleted', 'success'); }catch(e){ showToast('Delete failed: '+e.message,'error'); } }
-        else { items.splice(idx, 1); save(); populateAdminList(); populateClaimRequestsList(); populateClaimedList(); showToast('Deleted', 'success'); }
-      });
-    });
 
     // reveal password-change UI if present
     const cp = document.getElementById('changePasswordSection');
