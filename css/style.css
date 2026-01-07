@@ -111,7 +111,7 @@ header p {
   position: fixed;
   top: 1.25rem;
   right: 1.5rem;
-  z-index: 1300;
+  z-index: 1500;
   background: var(--gold);
   border: none;
   border-radius: 8px;
