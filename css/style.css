@@ -114,8 +114,8 @@ header p {
   z-index: 1500;
   background: var(--gold);
   border: none;
-  border-radius: 8px;
-  padding: 0.65rem;
+  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
   cursor: pointer;
   box-shadow: var(--shadow-md);
   flex-direction: column;
