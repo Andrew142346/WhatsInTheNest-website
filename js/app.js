@@ -99,6 +99,7 @@ function hideAdminLinks() {
     hamburger.addEventListener('click', () => {
       hamburger.classList.toggle('open');
       sidebar.classList.toggle('open');
+      document.body.classList.toggle('sidebar-open');
     });
     
     // Close sidebar when clicking outside
@@ -106,6 +107,7 @@ function hideAdminLinks() {
       if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains('open')) {
         hamburger.classList.remove('open');
         sidebar.classList.remove('open');
+        document.body.classList.remove('sidebar-open');
       }
     });
     
@@ -114,6 +116,7 @@ function hideAdminLinks() {
       if (e.key === 'Escape' && sidebar.classList.contains('open')) {
         hamburger.classList.remove('open');
         sidebar.classList.remove('open');
+        document.body.classList.remove('sidebar-open');
       }
     });
   }

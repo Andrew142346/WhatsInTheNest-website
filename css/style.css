@@ -31,6 +31,11 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   padding-top: 110px;
+  transition: transform 0.3s ease;
+}
+
+body.sidebar-open {
+  transform: translateX(-280px);
 }
 
 /* Modern Header with Logo in Top-Left */
