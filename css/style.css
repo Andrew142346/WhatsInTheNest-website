@@ -107,28 +107,30 @@ header p {
 
 /* Hamburger Menu */
 .hamburger {
-  display: flex;
+  display: flex !important;
   position: fixed;
   top: 1.25rem;
   right: 1.5rem;
   z-index: 1500;
-  background: var(--gold);
-  border: none;
-  border-radius: 6px;
-  padding: 0.65rem 0.75rem;
+  background: var(--gold) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 0.65rem 0.75rem !important;
   cursor: pointer;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md) !important;
   flex-direction: column;
   gap: 5px;
   transition: all 0.3s ease;
-  width: 40px;
-  height: 34px;
-  margin: 0;
+  width: 40px !important;
+  height: 34px !important;
+  margin: 0 !important;
 }
 
 .hamburger:hover {
-  background: var(--gold-dark);
-  transform: scale(1.05);
+  background: var(--gold-dark) !important;
+  transform: scale(1.05) !important;
+  box-shadow: var(--shadow-md) !important;
+  border-color: transparent !important;
 }
 
 .hamburger span {
