@@ -6,10 +6,10 @@
 }
 
 :root {
-  --primary-color: #4CAF50;
-  --primary-dark: #388E3C;
-  --secondary-color: #ff9800;
-  --accent-color: #2196F3;
+  --primary-color: #003DA5;
+  --primary-dark: #002163;
+  --secondary-color: #FFD700;
+  --accent-color: #FDB927;
   --text-color: #333;
   --text-light: #666;
   --background: #f8f9fa;
@@ -36,17 +36,31 @@ header {
   text-align: center;
   box-shadow: var(--shadow);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+header .logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
 header h1 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
+  color: var(--secondary-color);
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 header p {
   font-size: 1.1rem;
   opacity: 0.95;
+  color: white;
 }
 
 /* Hamburger Menu */

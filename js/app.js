@@ -184,6 +184,11 @@ function ensureToastContainer() {
   return c;
 }
 
+function escapeHtml(text) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text ? String(text).replace(/[&<>"']/g, m => map[m]) : '';
+}
+
 function showToast(msg, type = 'info', timeout = 3000) {
   const c = ensureToastContainer();
   const t = document.createElement('div');
@@ -237,10 +242,10 @@ function render(list = items) {
     const origIndex = items.indexOf(i);
     ul.insertAdjacentHTML('beforeend',
       `<li>
-        <strong>${i.name}</strong> (${i.category})
-        ${i.photo ? `<img src="${i.photo}" class="item-photo">` : ''}
-        <p>${i.desc}</p>
-        <em>${i.location}</em><br>
+        <strong>${escapeHtml(i.name)}</strong> (${escapeHtml(i.category)})
+        ${i.photo ? `<img src="${escapeHtml(i.photo)}" class="item-photo">` : ''}
+        <p>${escapeHtml(i.desc)}</p>
+        <em>${escapeHtml(i.location)}</em><br>
         <button class="inquireBtn" data-idx="${origIndex}" data-id="${i.id || ''}">Inquire</button>
         <button class="claimBtn" data-idx="${origIndex}" data-id="${i.id || ''}">Claim Item</button>
       </li>`);
@@ -343,6 +348,11 @@ if (form) {
   const itemLocationEl = document.getElementById('itemLocation');
   const itemPhotoEl = document.getElementById('itemPhoto');
   
+  if (!itemNameEl || !itemDescEl || !itemCategoryEl || !itemLocationEl) {
+    console.error('Required form elements not found');
+    return;
+  }
+  
   // Populate location datalist
   const locationDatalist = document.getElementById('locationOptions');
   if (locationDatalist) {
@@ -357,10 +367,15 @@ if (form) {
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const r = new FileReader();
     const file = itemPhotoEl && itemPhotoEl.files && itemPhotoEl.files[0];
-    r.onload = () => add(r.result);
-    (file ? r.readAsDataURL(file) : add(null));
+    
+    if (file) {
+      const r = new FileReader();
+      r.onload = () => add(r.result);
+      r.readAsDataURL(file);
+    } else {
+      add(null);
+    }
 
     function add(p) {
       const newItem = {
@@ -864,7 +879,9 @@ if (adminLoginModal && adminLoginForm && adminContent) {
       return;
     }
     
-    if (adminLoginPass.value !== getAdminPassword()) { 
+    const inputPass = adminLoginPass.value;
+    const correctPass = getAdminPassword();
+    if (!inputPass || !correctPass || inputPass.length !== correctPass.length || inputPass !== correctPass) { 
       showToast('Wrong password', 'error'); 
       return; 
     }
@@ -922,7 +939,11 @@ if(settingsLoginModal && settingsLoginForm && settingsContent){
       return;
     }
     
-    if(settingsLoginPass.value !== getAdminPassword()) return showToast('Wrong password', 'error');
+    const inputPass = settingsLoginPass.value;
+    const correctPass = getAdminPassword();
+    if (!inputPass || !correctPass || inputPass.length !== correctPass.length || inputPass !== correctPass) {
+      return showToast('Wrong password', 'error');
+    }
     setAdminLoggedIn();
     settingsLoginModal.style.display = 'none';
     settingsContent.style.display = 'block';
@@ -1146,7 +1167,9 @@ if(statsLoginModal && statsLoginForm) {
       return;
     }
     
-    if (statsLoginPass.value !== getAdminPassword()) { 
+    const inputPass = statsLoginPass.value;
+    const correctPass = getAdminPassword();
+    if (!inputPass || !correctPass || inputPass.length !== correctPass.length || inputPass !== correctPass) { 
       showToast('Wrong password', 'error'); 
       return; 
     }
