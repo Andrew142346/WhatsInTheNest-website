@@ -35,7 +35,7 @@ body {
 }
 
 body.sidebar-open {
-  transform: translateX(-140px);
+  transform: translateX(80px);
 }
 
 /* Modern Header with Logo in Top-Left */
@@ -110,7 +110,7 @@ header p {
   display: flex;
   position: fixed;
   top: 1.25rem;
-  right: 1.5rem;
+  left: 1.5rem;
   z-index: 1500;
   background: var(--gold);
   border: none;
@@ -156,19 +156,19 @@ header p {
 .sidebar {
   position: fixed;
   top: 0;
-  right: -300px;
+  left: -300px;
   width: 280px;
   height: 100vh;
   background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
-  box-shadow: -4px 0 24px rgba(0,0,0,0.2);
-  transition: right 0.3s ease;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+  transition: left 0.3s ease;
   z-index: 1250;
   padding: 7.5rem 0 2rem 0;
   overflow-y: auto;
 }
 
 .sidebar.open {
-  right: 0;
+  left: 0;
 }
 
 .sidebar nav {
@@ -645,6 +645,54 @@ button.secondary:hover {
 #reportForm button[type="submit"]:hover {
   background: linear-gradient(135deg, #555 0%, #333 100%);
   transform: scale(1.02);
+}
+
+/* Admin Panel Buttons - Greyscale Rectangles */
+#adminList button,
+#claimRequestsList button,
+#inquiriesList button,
+#claimedList button,
+.approveBtn,
+.deleteBtn,
+.approveClaimBtn,
+.rejectClaimBtn,
+.viewInquiriesBtn,
+.clearInquiriesBtn,
+.deleteClaimedBtn {
+  width: auto;
+  height: auto;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, #666 0%, #444 100%);
+  border: none;
+  margin: 0.25rem;
+}
+
+#adminList button:hover,
+#claimRequestsList button:hover,
+#inquiriesList button:hover,
+#claimedList button:hover {
+  background: linear-gradient(135deg, #555 0%, #333 100%);
+  transform: scale(1.05);
+}
+
+#adminList button.danger,
+#claimRequestsList button.danger,
+#inquiriesList button.danger,
+#claimedList button.danger,
+.deleteBtn,
+.rejectClaimBtn,
+.clearInquiriesBtn,
+.deleteClaimedBtn {
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+}
+
+#adminList button.danger:hover,
+#claimRequestsList button.danger:hover,
+#inquiriesList button.danger:hover,
+#claimedList button.danger:hover {
+  background: linear-gradient(135deg, #b71c1c 0%, #8b0000 100%);
 }
 
 /* Claim Modal */
