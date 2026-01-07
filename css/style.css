@@ -33,10 +33,6 @@ body {
   padding-top: 140px;
 }
 
-body.sidebar-open {
-  /* Sidebar overlays, no push */
-}
-
 /* Modern Header with Logo in Top-Left */
 header {
   background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
@@ -99,8 +95,6 @@ header p {
   color: var(--gold-light);
   font-weight: 500;
   margin: 0;
-  letter-spacing: 0.3px;
-}
   letter-spacing: 0.3px;
 }
 
