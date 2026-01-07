@@ -857,8 +857,10 @@ if (adminLoginModal && adminLoginForm && adminContent) {
   
   // Show modal if not logged in
   if (!isAdminLoggedIn()) {
+    adminLoginModal.classList.remove('hidden');
     adminLoginModal.style.display = 'flex';
   } else {
+    adminContent.classList.remove('hidden');
     adminContent.style.display = 'block';
     showAdminLinks();
     setupAdminUI();
@@ -872,7 +874,9 @@ if (adminLoginModal && adminLoginForm && adminContent) {
     if (apiEnabled()){
       apiAdminLogin(adminLoginPass.value).then(()=>{
         setAdminLoggedIn();
+        adminLoginModal.classList.add('hidden');
         adminLoginModal.style.display = 'none';
+        adminContent.classList.remove('hidden');
         adminContent.style.display = 'block';
         refreshFromServer().then(()=> { setupAdminUI(); }).catch(()=>{ setupAdminUI(); });
       }).catch(()=> showToast('Wrong password', 'error'));
@@ -887,7 +891,9 @@ if (adminLoginModal && adminLoginForm && adminContent) {
     }
     
     setAdminLoggedIn();
+    adminLoginModal.classList.add('hidden');
     adminLoginModal.style.display = 'none';
+    adminContent.classList.remove('hidden');
     adminContent.style.display = 'block';
     showAdminLinks();
     setupAdminUI();
@@ -919,8 +925,10 @@ const settingsContent = document.getElementById('settingsContent');
 if(settingsLoginModal && settingsLoginForm && settingsContent){
   // Show modal if not logged in
   if (!isAdminLoggedIn()) {
+    settingsLoginModal.classList.remove('hidden');
     settingsLoginModal.style.display = 'flex';
   } else {
+    settingsContent.classList.remove('hidden');
     settingsContent.style.display = 'block';
     showAdminLinks();
   }
@@ -933,7 +941,9 @@ if(settingsLoginModal && settingsLoginForm && settingsContent){
     if(apiEnabled()){
       apiAdminLogin(settingsLoginPass.value).then(()=>{ 
         setAdminLoggedIn();
+        settingsLoginModal.classList.add('hidden');
         settingsLoginModal.style.display = 'none';
+        settingsContent.classList.remove('hidden');
         settingsContent.style.display = 'block';
       }).catch(()=> showToast('Wrong password', 'error'));
       return;
@@ -945,7 +955,9 @@ if(settingsLoginModal && settingsLoginForm && settingsContent){
       return showToast('Wrong password', 'error');
     }
     setAdminLoggedIn();
+    settingsLoginModal.classList.add('hidden');
     settingsLoginModal.style.display = 'none';
+    settingsContent.classList.remove('hidden');
     settingsContent.style.display = 'block';
   });
 
@@ -1145,6 +1157,7 @@ const statsMain = document.querySelector('#statsSummary');
 if(statsLoginModal && statsLoginForm) {
   // Show modal if not logged in
   if (!isAdminLoggedIn()) {
+    statsLoginModal.classList.remove('hidden');
     statsLoginModal.style.display = 'flex';
     if(statsMain) statsMain.parentElement.style.display = 'none';
   } else {
@@ -1160,6 +1173,7 @@ if(statsLoginModal && statsLoginForm) {
     if (apiEnabled()){
       apiAdminLogin(statsLoginPass.value).then(()=>{
         setAdminLoggedIn();
+        statsLoginModal.classList.add('hidden');
         statsLoginModal.style.display = 'none';
         if(statsMain) statsMain.parentElement.style.display = 'block';
         if(document.getElementById('statsTotals')) renderStats();
@@ -1175,6 +1189,7 @@ if(statsLoginModal && statsLoginForm) {
     }
     
     setAdminLoggedIn();
+    statsLoginModal.classList.add('hidden');
     statsLoginModal.style.display = 'none';
     if(statsMain) statsMain.parentElement.style.display = 'block';
     showAdminLinks();
