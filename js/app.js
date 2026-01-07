@@ -156,6 +156,8 @@ async function apiReportItem(item){ const res = await apiFetch('POST', '/api/rep
 async function apiApprove(id){ const res = await apiFetch('POST', `/api/admin/approve/${id}`); return await res.json(); }
 async function apiDelete(id){ const res = await apiFetch('POST', `/api/admin/delete/${id}`); return await res.json(); }
 async function apiClaim(id, claimerName){ const res = await apiFetch('POST', `/api/items/claim/${id}`, { claimerName }); return await res.json(); }
+async function apiResolve(id){ const res = await apiFetch('POST', `/api/admin/resolve/${id}`); return await res.json(); }
+async function apiRejectClaim(id){ const res = await apiFetch('POST', `/api/admin/reject-claim/${id}`); return await res.json(); }
 async function apiAdminLogin(password){ const res = await apiFetch('POST', '/api/admin/login', { password }); return await res.json(); }
 async function apiChangePassword(newPassword){ const res = await apiFetch('POST', '/api/admin/change-password', { newPassword }); return await res.json(); }
 async function refreshFromServer(){ items = await apiGetItems(); render(); if(document.getElementById('statsTotals')) renderStats(); }
@@ -764,7 +766,16 @@ if (adminLoginModal && adminLoginForm && adminContent) {
           const id = btn.dataset.id;
           const idx = Number(btn.dataset.idx);
           if(apiEnabled() && id){ 
-            showToast('API claim approval not yet implemented', 'error');
+            try{ 
+              await apiResolve(id); 
+              await refreshFromServer(); 
+              populateAdminList(); 
+              populateClaimRequestsList(); 
+              populateClaimedList(); 
+              showToast('Claim approved', 'success'); 
+            } catch(e){ 
+              showToast('Approve claim failed: '+e.message, 'error'); 
+            }
           } else { 
             items[idx].resolved = true;
             items[idx].claimedAt = new Date().toISOString();
@@ -786,7 +797,16 @@ if (adminLoginModal && adminLoginForm && adminContent) {
           const ok = await showConfirm('Reject this claim request?');
           if (!ok) return;
           if(apiEnabled() && id){ 
-            showToast('API claim rejection not yet implemented', 'error');
+            try{ 
+              await apiRejectClaim(id); 
+              await refreshFromServer(); 
+              populateAdminList(); 
+              populateClaimRequestsList(); 
+              render(); 
+              showToast('Claim request rejected', 'success'); 
+            } catch(e){ 
+              showToast('Reject claim failed: '+e.message, 'error'); 
+            }
           } else { 
             items[idx].claimRequested = false;
             items[idx].claimerName = null;
