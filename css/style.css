@@ -156,7 +156,7 @@ header p {
 .sidebar {
   position: fixed;
   top: 0;
-  right: -320px;
+  right: -300px;
   width: 280px;
   height: 100vh;
   background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
