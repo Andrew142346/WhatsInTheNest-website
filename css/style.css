@@ -69,8 +69,8 @@ header .logo {
   border: 6px solid var(--gold);
   object-fit: cover;
   box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
-  background: transparent;
-  padding: 0;
+  background: white;
+  padding: 4px;
   transition: all 0.3s ease;
   object-position: center;
 }
