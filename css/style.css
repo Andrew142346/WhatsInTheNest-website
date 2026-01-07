@@ -616,6 +616,35 @@ button.secondary:hover {
   width: 100%;
   padding: 1rem;
   margin-top: 0.75rem;
+  border-radius: 8px;
+  height: auto;
+  background: linear-gradient(135deg, #666 0%, #444 100%);
+  border: none;
+  font-size: 1rem;
+}
+
+.login-modal-content button:hover {
+  background: linear-gradient(135deg, #555 0%, #333 100%);
+  transform: scale(1.02);
+}
+
+/* Report Form Submit Button */
+#reportForm button[type="submit"] {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #666 0%, #444 100%);
+  border: none;
+  font-size: 1.1rem;
+  margin: 1.5rem auto;
+  display: block;
+}
+
+#reportForm button[type="submit"]:hover {
+  background: linear-gradient(135deg, #555 0%, #333 100%);
+  transform: scale(1.02);
 }
 
 /* Claim Modal */
