@@ -155,7 +155,7 @@ async function apiGetItems(approvedOnly){
 async function apiReportItem(item){ const res = await apiFetch('POST', '/api/report', item); return await res.json(); }
 async function apiApprove(id){ const res = await apiFetch('POST', `/api/admin/approve/${id}`); return await res.json(); }
 async function apiDelete(id){ const res = await apiFetch('POST', `/api/admin/delete/${id}`); return await res.json(); }
-async function apiClaim(id){ const res = await apiFetch('POST', `/api/items/claim/${id}`); return await res.json(); }
+async function apiClaim(id, claimerName){ const res = await apiFetch('POST', `/api/items/claim/${id}`, { claimerName }); return await res.json(); }
 async function apiAdminLogin(password){ const res = await apiFetch('POST', '/api/admin/login', { password }); return await res.json(); }
 async function apiChangePassword(newPassword){ const res = await apiFetch('POST', '/api/admin/change-password', { newPassword }); return await res.json(); }
 async function refreshFromServer(){ items = await apiGetItems(); render(); if(document.getElementById('statsTotals')) renderStats(); }
@@ -312,7 +312,7 @@ function render(list = items) {
       // Show custom claim modal
       showClaimModal(async (claimerName) => {
         if (apiEnabled() && id) {
-          try { await apiClaim(id); await refreshFromServer(); showToast('Claim request submitted for approval.', 'success'); } catch (e){ showToast('Claim failed: '+e.message, 'error'); }
+          try { await apiClaim(id, claimerName); await refreshFromServer(); showToast('Claim request submitted for approval.', 'success'); } catch (e){ showToast('Claim failed: '+e.message, 'error'); }
         } else {
           claim(idx, claimerName);
         }
@@ -343,7 +343,7 @@ if(apiEnabled()){ refreshFromServer().catch(()=>{ render(); }); } else { render(
 async function claim(x, claimerName) {
   // x may be an index (local mode) or an id string (server mode)
   if (apiEnabled() && typeof x === 'string'){
-    try{ await apiClaim(x); await refreshFromServer(); showToast('Claim request submitted for approval.', 'success'); }catch(e){ showToast('Claim failed: '+e.message, 'error'); }
+    try{ await apiClaim(x, claimerName); await refreshFromServer(); showToast('Claim request submitted for approval.', 'success'); }catch(e){ showToast('Claim failed: '+e.message, 'error'); }
     return;
   }
   if (typeof x !== 'number' || !items[x]) return showToast('Item not found.', 'error');
