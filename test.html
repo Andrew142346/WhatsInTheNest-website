@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Script Test</title>
+</head>
+<body>
+  <h1>Testing JavaScript Load</h1>
+  <div id="test"></div>
+  
+  <script>
+    console.log('Test 1: Inline script works');
+    document.getElementById('test').innerHTML = 'If you see this, inline JavaScript works';
+  </script>
+  
+  <script src="config.js"></script>
+  <script>
+    console.log('Test 2: After config.js');
+    console.log('APP_CONFIG:', window.APP_CONFIG);
+  </script>
+  
+  <script src="js/app.js"></script>
+  <script>
+    console.log('Test 3: After app.js');
+    console.log('Items:', typeof items);
+  </script>
+</body>
+</html>
