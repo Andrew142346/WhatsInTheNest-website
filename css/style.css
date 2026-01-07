@@ -319,10 +319,10 @@ button,
   background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
   color: white;
   border: none;
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -334,6 +334,8 @@ button,
   text-align: center;
   margin: 1rem;
   border: 4px solid var(--gold);
+  padding: 1rem;
+  line-height: 1.3;
 }
 
 button:hover,
@@ -578,6 +580,70 @@ button.secondary:hover {
   margin-top: 0.75rem;
 }
 
+/* Claim Modal */
+.claim-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 31, 84, 0.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  backdrop-filter: blur(6px);
+}
+
+.claim-modal.show {
+  display: flex;
+}
+
+.claim-modal-content {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  min-width: 380px;
+  max-width: 500px;
+  box-shadow: 0 12px 48px rgba(0, 61, 165, 0.3);
+  animation: slideUp 0.4s ease;
+  border: 3px solid var(--gold);
+}
+
+.claim-modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--primary-blue);
+  font-size: 1.5rem;
+}
+
+.claim-modal-content input {
+  width: 100%;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 2px solid var(--border-light);
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.claim-modal-content input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px rgba(0, 61, 165, 0.1);
+}
+
+.claim-modal-content .button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.claim-modal-content .button-group button {
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  padding: 0.875rem 2rem;
+  margin: 0;
+  flex: 1;
+}
+
 /* Toast Notifications */
 .toast-container {
   position: fixed;
@@ -765,8 +831,8 @@ svg rect.chart-rect:hover {
 
   button,
   .btn {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
     font-size: 1rem;
     margin: 0.75rem;
   }
@@ -789,8 +855,8 @@ svg rect.chart-rect:hover {
 
   button,
   .btn {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     font-size: 0.9rem;
     margin: 0.5rem;
   }

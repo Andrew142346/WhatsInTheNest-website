@@ -130,9 +130,7 @@ function getApiBase(){
 
 function apiEnabled(){ 
   const base = getApiBase();
-  const enabled = !!base;
-  console.log('[API Debug] API Enabled:', enabled, 'API Base:', base, 'window.APP_CONFIG:', window.APP_CONFIG);
-  return enabled;
+  return !!base;
 }
 
 async function apiFetch(method, path, body){
@@ -187,6 +185,57 @@ function ensureToastContainer() {
 function escapeHtml(text) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return text ? String(text).replace(/[&<>"']/g, m => map[m]) : '';
+}
+
+// Custom claim modal
+function showClaimModal(onSubmit) {
+  const modal = document.createElement('div');
+  modal.className = 'claim-modal show';
+  modal.innerHTML = `
+    <div class="claim-modal-content">
+      <h3>Claim Item</h3>
+      <p>Please enter your name to claim this item:</p>
+      <input type="text" id="claimerNameInput" placeholder="Your name" required autocomplete="name">
+      <div class="button-group">
+        <button type="button" class="cancelBtn">Cancel</button>
+        <button type="button" class="confirmBtn">Submit Claim</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  const input = modal.querySelector('#claimerNameInput');
+  const cancelBtn = modal.querySelector('.cancelBtn');
+  const confirmBtn = modal.querySelector('.confirmBtn');
+  
+  input.focus();
+  
+  const cleanup = () => {
+    modal.classList.remove('show');
+    setTimeout(() => modal.remove(), 300);
+  };
+  
+  cancelBtn.addEventListener('click', cleanup);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) cleanup();
+  });
+  
+  confirmBtn.addEventListener('click', () => {
+    const name = input.value.trim();
+    if (!name) {
+      showToast('Name is required to claim an item.', 'error');
+      input.focus();
+      return;
+    }
+    cleanup();
+    onSubmit(name);
+  });
+  
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      confirmBtn.click();
+    }
+  });
 }
 
 function showToast(msg, type = 'info', timeout = 3000) {
@@ -257,18 +306,14 @@ function render(list = items) {
       const id = btn.dataset.id;
       const idx = Number(btn.dataset.idx);
       
-      // Prompt for claimer name
-      const claimerName = prompt('Please enter your name to claim this item:');
-      if (!claimerName || claimerName.trim() === '') {
-        showToast('Name is required to claim an item.', 'error');
-        return;
-      }
-      
-      if (apiEnabled() && id) {
-        try { await apiClaim(id); await refreshFromServer(); showToast('Claim request submitted for approval.', 'success'); } catch (e){ showToast('Claim failed: '+e.message, 'error'); }
-      } else {
-        claim(idx, claimerName.trim());
-      }
+      // Show custom claim modal
+      showClaimModal(async (claimerName) => {
+        if (apiEnabled() && id) {
+          try { await apiClaim(id); await refreshFromServer(); showToast('Claim request submitted for approval.', 'success'); } catch (e){ showToast('Claim failed: '+e.message, 'error'); }
+        } else {
+          claim(idx, claimerName);
+        }
+      });
     });
   });
   
@@ -278,18 +323,14 @@ function render(list = items) {
       const id = btn.dataset.id;
       const idx = Number(btn.dataset.idx);
       
-      // Prompt for inquirer name
-      const inquirerName = prompt('Please enter your name and contact info:');
-      if (!inquirerName || inquirerName.trim() === '') {
-        showToast('Name is required to inquire about an item.', 'error');
-        return;
-      }
-      
-      if (apiEnabled() && id) {
-        showToast('API inquire not yet implemented', 'error');
-      } else {
-        inquire(idx, inquirerName.trim());
-      }
+      // Show custom inquire modal
+      showClaimModal(async (inquirerName) => {
+        if (apiEnabled() && id) {
+          showToast('API inquire not yet implemented', 'error');
+        } else {
+          inquire(idx, inquirerName);
+        }
+      });
     });
   });
 }
