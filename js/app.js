@@ -391,8 +391,7 @@ if (form) {
   
   if (!itemNameEl || !itemDescEl || !itemCategoryEl || !itemLocationEl) {
     console.error('Required form elements not found');
-    return;
-  }
+  } else {
   
   // Populate location datalist
   const locationDatalist = document.getElementById('locationOptions');
@@ -444,6 +443,7 @@ if (form) {
       }
     }
   });
+  }
 }
 
 // Admin page login modal
