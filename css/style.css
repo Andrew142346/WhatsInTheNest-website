@@ -113,11 +113,12 @@ header p {
   background: var(--gold) !important;
   border: none !important;
   border-radius: 6px !important;
-  padding: 0.65rem 0.75rem !important;
+  padding: 8px 10px !important;
   cursor: pointer;
   box-shadow: var(--shadow-md) !important;
   flex-direction: column;
-  gap: 5px;
+  justify-content: space-around;
+  align-items: center;
   transition: all 0.3s ease;
   width: 40px !important;
   height: 34px !important;
@@ -133,12 +134,11 @@ header p {
 
 .hamburger span {
   display: block;
-  width: 24px;
+  width: 22px;
   height: 3px;
   background: var(--primary-blue);
   border-radius: 2px;
   transition: all 0.3s ease;
-  margin: 0 auto;
 }
 
 .hamburger.open span:nth-child(1) {
